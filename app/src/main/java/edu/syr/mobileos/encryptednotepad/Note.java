@@ -9,6 +9,12 @@ public class Note {
     private String mTitle;
     private String mEncryptedText;
 
+    public Note(long ID, String title, String encryptedText) {
+        mID = ID;
+        mTitle = title;
+        mEncryptedText = encryptedText;
+    }
+
     public long getID() {
         return mID;
     }
