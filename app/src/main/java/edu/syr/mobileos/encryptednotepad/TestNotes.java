@@ -7,6 +7,9 @@ import java.util.List;
  */
 public class TestNotes {
 
+    private static String test;
+
+    //private static String test2;
     private static List<Note> sNoteList;
 
     public static List<Note> get() {
