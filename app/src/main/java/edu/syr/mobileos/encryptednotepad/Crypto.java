@@ -21,13 +21,14 @@ public class Crypto {
 
     private static final String sIV = "0000000000000000";
 
+    private static final String ENCODER = "ISO-8859-1";
+
     public static byte[] sha256(String s) {
         MessageDigest digest = null;
 
         try {
             digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
 
@@ -57,10 +58,8 @@ public class Crypto {
 
         if (cipher != null) {
             try {
-                cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(sIV.getBytes("UTF-8")));
-                Log.d("debug", "decrypted data bytes: " + data.getBytes().toString());
-                byte [] encrypted_data = cipher.doFinal(data.getBytes());
-                Log.d("debug", "encrypted data bytes: " + encrypted_data.toString());
+                cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(sIV.getBytes(ENCODER)));
+                byte[] encrypted_data = cipher.doFinal(data.getBytes(ENCODER));
                 return bin2String(encrypted_data);
             }
             catch (Exception e) {
@@ -89,10 +88,8 @@ public class Crypto {
 
         if (cipher != null) {
             try {
-                cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(sIV.getBytes("UTF-8")));
-                Log.d("debug", "encrypted data bytes: " + data.getBytes().toString());
-                byte [] decrypted_data = cipher.doFinal(data.getBytes());
-                Log.d("debug", "decrypted data bytes: " + decrypted_data.toString());
+                cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(sIV.getBytes(ENCODER)));
+                byte [] decrypted_data = cipher.doFinal(data.getBytes(ENCODER));
                 return bin2String(decrypted_data);
             }
             catch (Exception e) {
@@ -112,7 +109,7 @@ public class Crypto {
         String encoded_data = null;
 
         try {
-            encoded_data = new String(data, "UTF-8");
+            encoded_data = new String(data, ENCODER);
         }
         catch (UnsupportedEncodingException e) {
             Log.d("debug", e.toString());
