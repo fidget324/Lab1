@@ -23,7 +23,15 @@ public class MainActivity extends Activity {
 
         new TestNotes();
         TestNotes.get();
-        Log.d("debug", Crypto.bin2hex(Crypto.sha256(sHardcodedKey)));
+
+        byte[] key = Crypto.sha256(sHardcodedKey);
+        Log.d("debug", "key: " + Crypto.bin2hex(key));
+        String plaintext = "hello kitty";
+        Log.d("debug", "plaintext: " + plaintext);
+        String ciphertext = Crypto.aes256_enc(key, plaintext);
+        Log.d("debug", "ciphertext: " + ciphertext);
+        plaintext = Crypto.aes256_dec(key, ciphertext);
+        Log.d("debug", "plaintext: " + plaintext);
 
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
