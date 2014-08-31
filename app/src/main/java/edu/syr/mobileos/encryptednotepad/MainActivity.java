@@ -3,6 +3,7 @@ package edu.syr.mobileos.encryptednotepad;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,10 +14,17 @@ import android.view.ViewGroup;
 
 public class MainActivity extends Activity {
 
+    private static final String sHardcodedKey = "mykey";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        new TestNotes();
+        TestNotes.get();
+        Log.d("debug", Crypto.bin2hex(Crypto.sha256(sHardcodedKey)));
+
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
