@@ -28,12 +28,12 @@ public class TestNotes {
         text = encryptText("This is a note");
         sNoteList.add(new Note(id, title, text));
 
-        id = 0;
+        id = 1;
         title = "Note 2";
         text = encryptText("This is another note");
         sNoteList.add(new Note(id, title, text));
 
-        id = 0;
+        id = 2;
         title = "Note 3";
         text = encryptText("This is yet another note");
         sNoteList.add(new Note(id, title, text));

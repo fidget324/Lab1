@@ -4,8 +4,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.List;
+
 /**
- * Created by scottconstable on 9/1/14.
+ * The entirety of the SQLite backend
  */
 public class NoteDB {
 
@@ -19,38 +21,70 @@ public class NoteDB {
     private static final String KEY_TITLE = "title";
     private static final String KEY_ENCRYPTED_TEXT = "text";
 
+    /**
+     * This defines the external interface to the SQL database
+     */
     public static class Agent {
 
         private static RecipeSQLiteOpenHelper sSQLHelper;
         private static SQLiteDatabase sDatabase;
 
+        // required empty constructor
         private Agent() {}
 
+        // initialize the Agent
         public static void init(Context context){
             if (sSQLHelper == null)
                 sSQLHelper = new RecipeSQLiteOpenHelper(context);
         }
 
-        public static long getAllNotes() {
-            return 0;
+        /**
+         * Gets all the notes in the database
+         * @return      list containing the id's of all notes in the database
+         */
+        public static List<Long> getAllNotes() {
+            return null;
         }
 
+        /**
+         * Adds a note to the database
+         * @param note  note to add
+         * @return      id of the newly added note
+         */
         public static long addNote(Note note) {
             return 0;
         }
 
+        /**
+         * Retrieves a particular note from the database
+         * @param id    id of the note to look up
+         * @return      the note
+         */
         public static Note getNote(long id) {
             return null;
         }
 
-        public static void updateNote(Note note) {
+        /**
+         * Updates an already existing note in the database
+         * @param note  the updated note
+         * @return      the id of the updated note in the database
+         */
+        public static long updateNote(Note note) {
+            return 0;
         }
 
+        /**
+         * Deletes a note from the database
+         * @param id    the id of the note to delete
+         */
         public static void deleteNote(long id) {
         }
 
     }
 
+    /**
+     * The very backend. This creates the SQLite database when the app is first run
+     */
     private static class RecipeSQLiteOpenHelper extends SQLiteOpenHelper {
 
         private static final int DATABASE_VERSION = 1;
