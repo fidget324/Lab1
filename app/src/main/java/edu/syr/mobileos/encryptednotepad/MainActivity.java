@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 
 public class MainActivity extends Activity {
 
-    private static final String sHardcodedKey = "mykey";
+    public static final String sHardcodedKey = "mykey";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

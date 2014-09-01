@@ -25,7 +25,23 @@ public class TestNotes {
 
         id = 0;
         title = "Note 1";
+        text = encryptText("This is a note");
+        sNoteList.add(new Note(id, title, text));
 
+        id = 0;
+        title = "Note 2";
+        text = encryptText("This is another note");
+        sNoteList.add(new Note(id, title, text));
+
+        id = 0;
+        title = "Note 3";
+        text = encryptText("This is yet another note");
+        sNoteList.add(new Note(id, title, text));
+    }
+
+    private static String encryptText(String text) {
+        byte[] key = Crypto.sha256(MainActivity.sHardcodedKey);
+        return Crypto.aes256_enc(key, text);
     }
 
 }
