@@ -1,46 +1,35 @@
 package edu.syr.mobileos.encryptednotepad;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import java.util.List;
 
-
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link NoteListFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link NoteListFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * A list of all the notes currently stored in the app. Each entry contains the note title,
+ * and (optionally) the date on which it was created.
  *
+ * Clicking on an entry will trigger a callback, onNoteClicked(), to the MainActivity
+ * with that note's ID. Long clicking on an entry will trigger a popup menu. The
+ * popup menu provides two options: editing and deleting the selected note. Clicking either of
+ * these will send an onNoteInteraction() callback to the MainActivity.
+ *
+ * There is one action bar button for adding a new note. This triggers a callback,
+ * onNoteCreateClicked(), to the MainActivity.
  */
-public class NoteListFragment extends Fragment {
+public class NoteListFragment extends NoteManipulatorFragment {
 
-    private OnFragmentInteractionListener mListener;
-
-    private List<Note> mNotes;
+    private List<Long> mNotes;
 
     // TODO: Rename and change types and number of parameters
     public static NoteListFragment newInstance() {
         NoteListFragment fragment = new NoteListFragment();
-        Bundle args = new Bundle();
-
-        /*
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        */
-
-        fragment.setArguments(args);
         return fragment;
     }
+
     public NoteListFragment() {
         // Required empty public constructor
     }
@@ -48,13 +37,6 @@ public class NoteListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        /*
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-        */
     }
 
     @Override
@@ -68,68 +50,19 @@ public class NoteListFragment extends Fragment {
         return fragment_view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    public interface OnNoteClickedListener {
+        /**
+         * Callback to parent activity when a note is clicked
+         * @param note_id   SQL id of the note that was clicked
+         */
+        public void onNoteClicked(long note_id);
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
-    }
-
-    private class ListAdapter extends BaseAdapter {
-
-        @Override
-        public int getCount() {
-            return mNotes.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return mNotes.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-
-
-            return null;
-        }
+    public interface OnNoteCreateListener {
+        /**
+         * Callback to parent activity when a new note should be created
+         */
+        public void onNoteCreateClicked();
     }
 
 }

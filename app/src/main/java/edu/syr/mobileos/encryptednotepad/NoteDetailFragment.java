@@ -1,30 +1,23 @@
 package edu.syr.mobileos.encryptednotepad;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
-
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link edu.syr.mobileos.encryptednotepad.NoteDetailFragment.OnNoteInteractionListener} interface
- * to handle interaction events.
- * Use the {@link NoteDetailFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * A fragment which displays the details for a given note. These include the note's title,
+ * decrypted text, and (optionally) the date of creation.
  *
+ * There are two action bar buttons: one for editing the current note, and one for deleting
+ * it. These two buttons trigger callbacks to the MainActivity via the interface defined in
+ * NoteManipulatorFragment.
  */
-public class NoteDetailFragment extends Fragment {
+public class NoteDetailFragment extends NoteManipulatorFragment {
 
     private static final String ARG_NOTE_ID = "note_id";
 
     private long mNoteID;
-
-    private OnNoteInteractionListener mListener;
 
     public static NoteDetailFragment newInstance(long note_id) {
         NoteDetailFragment fragment = new NoteDetailFragment();
@@ -51,32 +44,6 @@ public class NoteDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_note_detail, container, false);
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnNoteInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnNoteInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface OnNoteInteractionListener {
-        /**
-         * Callback to parent activity when a note manipulation is required
-         * @param action    can be Note.ACTION_DELETE or Note.ACTION_EDIT
-         * @param note_id   SQL id of the note to manipulate
-         */
-        public void onNoteInteraction(int action, long note_id);
     }
 
 }

@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
         new TestNotes();
         TestNotes.get();
 
+        // Example demonstrating the Crypto class
         byte[] key = Crypto.sha256(sHardcodedKey);
         Log.d("debug", "key: " + Crypto.bin2hex(key));
         String plaintext = "hello kitty";

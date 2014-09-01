@@ -8,6 +8,9 @@ import java.util.List;
 
 /**
  * The entirety of the SQLite backend
+ *
+ * The rest of the app interacts with NoteDB via the six public methods defined
+ * in the nested Agent class.
  */
 public class NoteDB {
 
