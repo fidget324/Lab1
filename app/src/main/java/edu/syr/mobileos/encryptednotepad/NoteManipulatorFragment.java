@@ -8,13 +8,13 @@ import android.app.Fragment;
  */
 public abstract class NoteManipulatorFragment extends Fragment {
 
-    protected OnNoteInteractionListener mListener;
+    protected OnNoteInteractionListener mInteractionListener;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnNoteInteractionListener) activity;
+            mInteractionListener = (OnNoteInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnNoteInteractionListener");
@@ -24,7 +24,7 @@ public abstract class NoteManipulatorFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        mInteractionListener = null;
     }
 
     public interface OnNoteInteractionListener {

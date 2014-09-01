@@ -1,5 +1,6 @@
 package edu.syr.mobileos.encryptednotepad;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,8 @@ import java.util.List;
 public class NoteListFragment extends NoteManipulatorFragment {
 
     private List<Long> mNotes;
+    private OnNoteClickedListener mNoteClickedListener;
+    private OnNoteCreateListener mNoteCreateListener;
 
     // TODO: Rename and change types and number of parameters
     public static NoteListFragment newInstance() {
@@ -48,6 +51,30 @@ public class NoteListFragment extends NoteManipulatorFragment {
         ListView listView = (ListView) fragment_view.findViewById(R.id.list);
 
         return fragment_view;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mNoteClickedListener = (OnNoteClickedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnNoteClickedListener");
+        }
+        try {
+            mNoteCreateListener = (OnNoteCreateListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnNoteCreateListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mNoteClickedListener = null;
+        mNoteCreateListener = null;
     }
 
     public interface OnNoteClickedListener {

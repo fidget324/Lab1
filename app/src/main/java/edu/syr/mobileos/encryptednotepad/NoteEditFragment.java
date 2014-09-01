@@ -1,5 +1,6 @@
 package edu.syr.mobileos.encryptednotepad;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ public class NoteEditFragment extends Fragment {
 
     private static final String ARG_NOTE_ID = "note_id";
 
+    private OnDoneClickedListener mDoneListener;
     private long mNoteID;
 
     /**
@@ -59,6 +61,23 @@ public class NoteEditFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_note_edit, container, false);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mDoneListener = (OnDoneClickedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnDoneClickedListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mDoneListener = null;
     }
 
     public interface OnDoneClickedListener {
