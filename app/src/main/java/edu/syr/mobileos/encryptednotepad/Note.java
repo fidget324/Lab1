@@ -12,6 +12,14 @@ public class Note {
     private String mTitle;
     private String mEncryptedText;
 
+    public Note(String title, String encryptedText) {
+        mID = 0;
+        mTitle = title;
+        mEncryptedText = encryptedText;
+    }
+
+    // this constructor should only be used for testing purposes, SQL provides
+    // the ID automatically
     public Note(long ID, String title, String encryptedText) {
         mID = ID;
         mTitle = title;

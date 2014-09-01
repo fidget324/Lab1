@@ -4,13 +4,17 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * The entirety of the SQLite backend
  *
  * The rest of the app interacts with NoteDB via the six public methods defined
  * in the nested Agent class.
+ *
+ * DOES NOT USE RAW QUERIES.
  */
 public class NoteDB {
 
@@ -45,8 +49,11 @@ public class NoteDB {
          * Gets all the notes in the database
          * @return      list containing the id's of all notes in the database
          */
-        public static List<Long> getAllNotes() {
-            return null;
+        public static List<Long> getAllNotes() { // TODO
+            List<Long> note_ids = new ArrayList<Long>();
+            for (Note n : TestNotes.get())
+                note_ids.add(n.getID());
+            return note_ids;
         }
 
         /**
@@ -54,8 +61,11 @@ public class NoteDB {
          * @param note  note to add
          * @return      id of the newly added note
          */
-        public static long addNote(Note note) {
-            return 0;
+        public static long addNote(Note note) { // TODO
+            Random rand = new Random();
+            note.setID(rand.nextLong());
+            TestNotes.get().add(note);
+            return note.getID();
         }
 
         /**
@@ -63,7 +73,10 @@ public class NoteDB {
          * @param id    id of the note to look up
          * @return      the note
          */
-        public static Note getNote(long id) {
+        public static Note getNote(long id) { // TODO
+            for (Note n : TestNotes.get())
+                if (n.getID() == id)
+                    return n;
             return null;
         }
 
@@ -72,15 +85,24 @@ public class NoteDB {
          * @param note  the updated note
          * @return      the id of the updated note in the database
          */
-        public static long updateNote(Note note) {
-            return 0;
+        public static long updateNote(Note note) { // TODO
+            for (Note n : TestNotes.get())
+                if (n.getID() == note.getID()) {
+                    TestNotes.get().remove(n);
+                    TestNotes.get().add(note);
+                    return note.getID();
+                }
+            return -1;
         }
 
         /**
          * Deletes a note from the database
          * @param id    the id of the note to delete
          */
-        public static void deleteNote(long id) {
+        public static void deleteNote(long id) { // TODO
+            for (Note n : TestNotes.get())
+                if (n.getID() == id)
+                    TestNotes.get().remove(n);
         }
 
     }
@@ -115,7 +137,7 @@ public class NoteDB {
             // Drop older TABLE if it existed
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTES);
 
-            // Create TABLEs again
+            // Create tables again
             onCreate(db);
         }
 
