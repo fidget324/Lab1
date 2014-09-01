@@ -5,6 +5,10 @@ package edu.syr.mobileos.encryptednotepad;
  */
 public class Note {
 
+    public static final int ACTION_DELETE       = 0;
+    public static final int ACTION_CREATE       = 1;
+    public static final int ACTION_EDIT         = 2;
+
     private long mID;
     private String mTitle;
     private String mEncryptedText;
