@@ -15,7 +15,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Created by scottconstable on 8/31/14.
+ * Crypto library to support SHA256 and AES256
  */
 public class Crypto {
 
@@ -23,6 +23,11 @@ public class Crypto {
 
     private static final String ENCODER = "ISO-8859-1";
 
+    /**
+     * Performs SHA256 on a string
+     * @param s     The string to hash
+     * @return      A byte array containing the resulting 32-byte hash
+     */
     public static byte[] sha256(String s) {
         MessageDigest digest = null;
 
@@ -40,6 +45,12 @@ public class Crypto {
         return null;
     }
 
+    /**
+     * Encrypt a string using AES256
+     * @param key   the 32-byte key
+     * @param data  the string to encrypt
+     * @return      the encrypted string
+     */
     public static String aes256_enc(byte[] key, String data) {
 
         Assert.assertEquals(32, key.length); // 32 bytes = 256-bit key
@@ -70,6 +81,12 @@ public class Crypto {
         return null;
     }
 
+    /**
+     * Decrypt a string using AES256
+     * @param key   the 32-byte key
+     * @param data  the string to decrypt
+     * @return      the decrypted string
+     */
     public static String aes256_dec(byte[] key, String data) {
 
         Assert.assertEquals(32, key.length); // 32 bytes = 256-bit key

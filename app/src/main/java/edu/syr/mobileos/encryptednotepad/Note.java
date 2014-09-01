@@ -1,7 +1,7 @@
 package edu.syr.mobileos.encryptednotepad;
 
 /**
- * Created by scottconstable on 8/29/14.
+ * Structure for an individual note
  */
 public class Note {
 
