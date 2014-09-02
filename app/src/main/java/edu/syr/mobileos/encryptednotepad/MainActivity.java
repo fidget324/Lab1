@@ -12,7 +12,12 @@ import android.view.ViewGroup;
 
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements
+        NoteManipulatorFragment.OnNoteInteractionListener,
+        NoteEditFragment.OnDoneClickedListener,
+        NoteListFragment.OnNoteCreateListener,
+        NoteListFragment.OnNoteClickedListener
+{
 
     public static final String sHardcodedKey = "mykey";
 
@@ -55,9 +60,6 @@ public class MainActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -75,5 +77,25 @@ public class MainActivity extends Activity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             return rootView;
         }
+    }
+
+    @Override
+    public void onDoneClicked(long note_id) {
+
+    }
+
+    @Override
+    public void onNoteClicked(long note_id) {
+
+    }
+
+    @Override
+    public void onNoteCreateClicked() {
+
+    }
+
+    @Override
+    public void onNoteInteraction(int action, long note_id) {
+
     }
 }
