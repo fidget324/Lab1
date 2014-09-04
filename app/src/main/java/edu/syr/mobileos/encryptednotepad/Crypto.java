@@ -15,7 +15,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Crypto library to support SHA256 and AES256
+ * Crypto library to support SHA256, HMAC_SHA256, and AES256
  */
 public class Crypto {
 
@@ -127,6 +127,19 @@ public class Crypto {
 
         try {
             encoded_data = new String(data, ENCODER);
+        }
+        catch (UnsupportedEncodingException e) {
+            Log.d("debug", e.toString());
+        }
+
+        return encoded_data;
+    }
+
+    public static byte[] string2Bin(String s) {
+        byte[] encoded_data = null;
+
+        try {
+            encoded_data = s.getBytes(ENCODER);
         }
         catch (UnsupportedEncodingException e) {
             Log.d("debug", e.toString());

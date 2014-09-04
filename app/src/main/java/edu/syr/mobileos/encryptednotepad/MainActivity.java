@@ -1,25 +1,47 @@
 package edu.syr.mobileos.encryptednotepad;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-
 
 
 public class MainActivity extends Activity implements
         NoteManipulatorFragment.OnNoteInteractionListener,
         NoteEditFragment.OnDoneClickedListener,
         NoteListFragment.OnNoteCreateListener,
-        NoteListFragment.OnNoteClickedListener
+        NoteListFragment.OnNoteClickedListener,
+        PasswordDialogFragment.EditPasswordDialogListener
 {
 
-    public static final String sHardcodedKey = "mykey";
+    private static final int REQUEST_DATA = 0;
+
+    private byte[] mKey;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        PasswordDialogFragment dialogFragment = new PasswordDialogFragment();
+        dialogFragment.show(getFragmentManager(), null);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        for (int i = 0; i < mKey.length; i++)
+            mKey[i] = 0;
+
+        // Example demonstrating the Crypto class
+        Log.d("debug", "key: " + Crypto.bin2hex(mKey));
+        String plaintext = "hello kitty";
+        Log.d("debug", "plaintext: " + plaintext);
+        String ciphertext = Crypto.aes256_enc(mKey, plaintext);
+        Log.d("debug", "ciphertext: " + ciphertext);
+        plaintext = Crypto.aes256_dec(mKey, ciphertext);
+        Log.d("debug", "plaintext: " + plaintext);
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,23 +51,12 @@ public class MainActivity extends Activity implements
         new TestNotes();
         TestNotes.get();
 
-        // Example demonstrating the Crypto class
-        byte[] key = Crypto.sha256(sHardcodedKey);
-        Log.d("debug", "key: " + Crypto.bin2hex(key));
-        String plaintext = "hello kitty";
-        Log.d("debug", "plaintext: " + plaintext);
-        String ciphertext = Crypto.aes256_enc(key, plaintext);
-        Log.d("debug", "ciphertext: " + ciphertext);
-        plaintext = Crypto.aes256_dec(key, ciphertext);
-        Log.d("debug", "plaintext: " + plaintext);
-
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.container, NoteListFragment.newInstance())
                     .commit();
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -63,39 +74,55 @@ public class MainActivity extends Activity implements
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
-    }
-
     @Override
     public void onDoneClicked(long note_id) {
-
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, NoteDetailFragment.newInstance(note_id))
+                .commit();
     }
 
     @Override
     public void onNoteClicked(long note_id) {
-
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, NoteDetailFragment.newInstance(note_id))
+                .commit();
     }
 
     @Override
     public void onNoteCreateClicked() {
-
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, NoteEditFragment.newInstance())
+                .commit();
     }
 
     @Override
     public void onNoteInteraction(int action, long note_id) {
+        switch (action) {
+            case Note.ACTION_DELETE:
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.container, NoteListFragment.newInstance())
+                        .commit();
+                break;
+            case Note.ACTION_EDIT:
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.container, NoteEditFragment.newInstance(note_id))
+                        .commit();
+                break;
+        }
+    }
+
+    @Override
+    public void onFinishEditDialog(String password) {
+        mKey = Crypto.sha256(password);
+
+        // Example demonstrating the Crypto class
+        Log.d("debug", "key: " + Crypto.bin2hex(mKey));
+        String plaintext = "hello kitty";
+        Log.d("debug", "plaintext: " + plaintext);
+        String ciphertext = Crypto.aes256_enc(mKey, plaintext);
+        Log.d("debug", "ciphertext: " + ciphertext);
+        plaintext = Crypto.aes256_dec(mKey, ciphertext);
+        Log.d("debug", "plaintext: " + plaintext);
 
     }
 }

@@ -40,7 +40,7 @@ public class TestNotes {
     }
 
     private static String encryptText(String text) {
-        byte[] key = Crypto.sha256(MainActivity.sHardcodedKey);
+        byte[] key = Crypto.sha256("");
         return Crypto.aes256_enc(key, text);
     }
 
