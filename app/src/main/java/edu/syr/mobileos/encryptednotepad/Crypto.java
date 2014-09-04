@@ -19,7 +19,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class Crypto {
 
-    private static final String sIV = "0000000000000000";
+    private static final String sIV = "0000000000000000"; //todo
 
     private static final String ENCODER = "ISO-8859-1";
 
