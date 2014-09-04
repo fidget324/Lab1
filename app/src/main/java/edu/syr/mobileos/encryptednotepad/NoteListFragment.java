@@ -80,9 +80,9 @@ public class NoteListFragment extends NoteManipulatorFragment {
     public interface OnNoteClickedListener {
         /**
          * Callback to parent activity when a note is clicked
-         * @param note_id   SQL id of the note that was clicked
+         * @param note   the note that was clicked
          */
-        public void onNoteClicked(long note_id);
+        public void onNoteClicked(Note note);
     }
 
     public interface OnNoteCreateListener {

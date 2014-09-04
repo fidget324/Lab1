@@ -15,6 +15,7 @@ public class Note implements Serializable {
     private long mID;
     private String mTitle;
     private String mText;
+    private byte[] mIV;
 
     public Note(String title, String text) {
         mID = 0;
@@ -52,5 +53,13 @@ public class Note implements Serializable {
 
     public void setText(String text) {
         mText = text;
+    }
+
+    public byte[] getIV() {
+        return mIV;
+    }
+
+    public void setIV(byte[] IV) {
+        mIV = IV;
     }
 }

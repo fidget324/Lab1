@@ -15,14 +15,15 @@ import android.view.ViewGroup;
  */
 public class NoteDetailFragment extends NoteManipulatorFragment {
 
-    private static final String ARG_NOTE_ID = "note_id";
+    private static final String ARG_NOTE =
+            "edu.syr.mobileos.encryptednotepad.NoteDetailFragment.note";
 
-    private long mNoteID;
+    private Note mNote;
 
-    public static NoteDetailFragment newInstance(long note_id) {
+    public static NoteDetailFragment newInstance(Note note) {
         NoteDetailFragment fragment = new NoteDetailFragment();
         Bundle args = new Bundle();
-        args.putLong(ARG_NOTE_ID, note_id);
+        args.putSerializable(ARG_NOTE, note);
         fragment.setArguments(args);
         return fragment;
     }
@@ -35,7 +36,7 @@ public class NoteDetailFragment extends NoteManipulatorFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mNoteID = getArguments().getLong(ARG_NOTE_ID);
+            mNote = (Note) getArguments().getSerializable(ARG_NOTE);
         }
     }
 

@@ -14,20 +14,21 @@ import android.view.ViewGroup;
  */
 public class NoteEditFragment extends Fragment {
 
-    private static final String ARG_NOTE_ID = "note_id";
+    private static final String ARG_NOTE =
+            "edu.syr.mobileos.encryptednotepad.NoteEditFragment.note";
 
     private OnDoneClickedListener mDoneListener;
     private long mNoteID;
 
     /**
      * For editing an already existing note
-     * @param note_id   the SQL ID for the already existing note
+     * @param note      the already existing note
      * @return          the new fragment
      */
-    public static NoteEditFragment newInstance(long note_id) {
+    public static NoteEditFragment newInstance(Note note) {
         NoteEditFragment fragment = new NoteEditFragment();
         Bundle args = new Bundle();
-        args.putLong(ARG_NOTE_ID, note_id);
+        args.putSerializable(ARG_NOTE, note);
         fragment.setArguments(args);
         return fragment;
     }
@@ -49,7 +50,7 @@ public class NoteEditFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) { // editing an existing note
-            mNoteID = getArguments().getLong(ARG_NOTE_ID);
+            mNoteID = getArguments().getLong(ARG_NOTE);
         }
         else { // creating a new note
 
@@ -83,9 +84,9 @@ public class NoteEditFragment extends Fragment {
     public interface OnDoneClickedListener {
         /**
          * Callback to parent activity when a note has been edited
-         * @param note_id   SQL id of the note that was edited
+         * @param note   the note that was edited
          */
-        public void onDoneClicked(long note_id);
+        public void onDoneClicked(Note note);
     }
 
 }

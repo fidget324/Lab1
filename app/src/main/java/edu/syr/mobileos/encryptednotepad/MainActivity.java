@@ -15,8 +15,6 @@ public class MainActivity extends Activity implements
         PasswordDialogFragment.EditPasswordDialogListener
 {
 
-    private static final int REQUEST_DATA = 0;
-
     private byte[] mKey;
 
     @Override
@@ -31,16 +29,6 @@ public class MainActivity extends Activity implements
         super.onStop();
         for (int i = 0; i < mKey.length; i++)
             mKey[i] = 0;
-
-        // Example demonstrating the Crypto class
-        Log.d("debug", "key: " + Crypto.bin2hex(mKey));
-        String plaintext = "hello kitty";
-        Log.d("debug", "plaintext: " + plaintext);
-        String ciphertext = Crypto.aes256_enc(mKey, plaintext);
-        Log.d("debug", "ciphertext: " + ciphertext);
-        plaintext = Crypto.aes256_dec(mKey, ciphertext);
-        Log.d("debug", "plaintext: " + plaintext);
-
     }
 
     @Override
@@ -75,16 +63,16 @@ public class MainActivity extends Activity implements
     }
 
     @Override
-    public void onDoneClicked(long note_id) {
+    public void onDoneClicked(Note note) {
         getFragmentManager().beginTransaction()
-                .replace(R.id.container, NoteDetailFragment.newInstance(note_id))
+                .replace(R.id.container, NoteDetailFragment.newInstance(note))
                 .commit();
     }
 
     @Override
-    public void onNoteClicked(long note_id) {
+    public void onNoteClicked(Note note) {
         getFragmentManager().beginTransaction()
-                .replace(R.id.container, NoteDetailFragment.newInstance(note_id))
+                .replace(R.id.container, NoteDetailFragment.newInstance(note))
                 .commit();
     }
 
@@ -96,7 +84,7 @@ public class MainActivity extends Activity implements
     }
 
     @Override
-    public void onNoteInteraction(int action, long note_id) {
+    public void onNoteInteraction(int action, Note note) {
         switch (action) {
             case Note.ACTION_DELETE:
                 getFragmentManager().beginTransaction()
@@ -105,7 +93,7 @@ public class MainActivity extends Activity implements
                 break;
             case Note.ACTION_EDIT:
                 getFragmentManager().beginTransaction()
-                        .replace(R.id.container, NoteEditFragment.newInstance(note_id))
+                        .replace(R.id.container, NoteEditFragment.newInstance(note))
                         .commit();
                 break;
         }
@@ -114,7 +102,10 @@ public class MainActivity extends Activity implements
     @Override
     public void onFinishEditDialog(String password) {
         mKey = Crypto.sha256(password);
+    }
 
+    // test function, please ignore
+    private void testCrypto() {
         // Example demonstrating the Crypto class
         Log.d("debug", "key: " + Crypto.bin2hex(mKey));
         String plaintext = "hello kitty";
@@ -123,6 +114,5 @@ public class MainActivity extends Activity implements
         Log.d("debug", "ciphertext: " + ciphertext);
         plaintext = Crypto.aes256_dec(mKey, ciphertext);
         Log.d("debug", "plaintext: " + plaintext);
-
     }
 }
