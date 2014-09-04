@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * A list of all the notes currently stored in the app. Each entry contains the note title,
@@ -23,13 +23,19 @@ import java.util.List;
  */
 public class NoteListFragment extends NoteManipulatorFragment {
 
-    private List<Long> mNotes;
+    private static final String ARG_NOTES =
+            "edu.syr.mobileos.encryptednotepad.NoteListFragment.notes";
+
+    private ArrayList<Note> mNotes;
     private OnNoteClickedListener mNoteClickedListener;
     private OnNoteCreateListener mNoteCreateListener;
 
     // TODO: Rename and change types and number of parameters
-    public static NoteListFragment newInstance() {
+    public static NoteListFragment newInstance(ArrayList<Note> notes) {
         NoteListFragment fragment = new NoteListFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_NOTES, notes);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -40,6 +46,9 @@ public class NoteListFragment extends NoteManipulatorFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mNotes = (ArrayList<Note>) getArguments().getSerializable(ARG_NOTES);
+        }
     }
 
     @Override

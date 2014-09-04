@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends Activity implements
         NoteManipulatorFragment.OnNoteInteractionListener,
@@ -29,6 +31,7 @@ public class MainActivity extends Activity implements
         super.onStop();
         for (int i = 0; i < mKey.length; i++)
             mKey[i] = 0;
+        finish();
     }
 
     @Override
@@ -39,11 +42,6 @@ public class MainActivity extends Activity implements
         new TestNotes();
         TestNotes.get();
 
-        if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, NoteListFragment.newInstance())
-                    .commit();
-        }
     }
 
     @Override
@@ -64,8 +62,13 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onDoneClicked(Note note) {
+        long note_id;
+        if ((note_id = NoteDB.Agent.updateNote(note)) == -1) {
+            note_id = NoteDB.Agent.addNote(note);
+        }
+        Note new_note = NoteDB.Agent.getNote(note_id);
         getFragmentManager().beginTransaction()
-                .replace(R.id.container, NoteDetailFragment.newInstance(note))
+                .replace(R.id.container, NoteDetailFragment.newInstance(new_note))
                 .commit();
     }
 
@@ -87,14 +90,25 @@ public class MainActivity extends Activity implements
     public void onNoteInteraction(int action, Note note) {
         switch (action) {
             case Note.ACTION_DELETE:
+                NoteDB.Agent.deleteNote(note.getID());
+                ArrayList<Note> notes = new ArrayList<Note>();
+                for (long id : NoteDB.Agent.getAllNotes())
+                    notes.add(NoteDB.Agent.getNote(id));
                 getFragmentManager().beginTransaction()
-                        .replace(R.id.container, NoteListFragment.newInstance())
+                        .replace(R.id.container, NoteListFragment.newInstance(notes))
                         .commit();
                 break;
             case Note.ACTION_EDIT:
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.container, NoteEditFragment.newInstance(note))
-                        .commit();
+                long note_id;
+                if ((note_id = NoteDB.Agent.updateNote(note)) == -1) {
+                    Log.d("MainActivity", "tried to update a note which doesn't exist in DB");
+                }
+                else {
+                    Note new_note = NoteDB.Agent.getNote(note_id);
+                    getFragmentManager().beginTransaction()
+                            .replace(R.id.container, NoteEditFragment.newInstance(new_note))
+                            .commit();
+                }
                 break;
         }
     }
@@ -102,6 +116,14 @@ public class MainActivity extends Activity implements
     @Override
     public void onFinishEditDialog(String password) {
         mKey = Crypto.sha256(password);
+
+        ArrayList<Note> notes = new ArrayList<Note>();
+        for (long id : NoteDB.Agent.getAllNotes())
+            notes.add(NoteDB.Agent.getNote(id));
+
+        getFragmentManager().beginTransaction()
+                .add(R.id.container, NoteListFragment.newInstance(notes))
+                .commit();
     }
 
     // test function, please ignore

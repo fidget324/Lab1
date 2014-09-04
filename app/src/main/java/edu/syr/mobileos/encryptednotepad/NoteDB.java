@@ -81,9 +81,10 @@ public class NoteDB {
         }
 
         /**
-         * Updates an already existing note in the database
+         * Updates an already existing note in the database. If the note does not exist
+         * in the database, return -1
          * @param note  the updated note
-         * @return      the id of the updated note in the database
+         * @return      the id of the updated note in the database, or -1 if note DNE
          */
         public static long updateNote(Note note) { // TODO
             for (Note n : TestNotes.get())
