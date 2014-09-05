@@ -41,7 +41,8 @@ public class TestNotes {
 
     private static String encryptText(String text) {
         byte[] key = Crypto.sha256(MainActivity.sHardcodedKey);
-        return Crypto.aes256_enc(key, text);
+        //return Crypto.aes256_enc(key, text);
+       return "hello testnodes"; //changed
     }
 
 }

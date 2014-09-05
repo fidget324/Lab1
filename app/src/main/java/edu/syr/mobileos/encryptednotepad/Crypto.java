@@ -26,18 +26,23 @@ public class Crypto {
 
     private static final String ENCODER = "ISO-8859-1";
 
-    //there might be something wrong here about sIV!!!
-    private static final byte[] sIV = new byte[256];// = "0000000000000000"; //todo
-    static{
-        new Random().nextBytes(sIV);
-        //sIV = "234";
-    }
     /**
-     * Performs SHA256 on a string
-     * @param s     The string to hash
-     * @return      A byte array containing the resulting 32-byte hash
+     * offer a 16-byte IV for each note, since the block size in AES is 16 bytes
      */
 
+    public static byte[] getIV() {
+        int length = 16;
+        byte[] buf = new byte[length];
+        new Random().nextBytes(buf);
+        return buf;
+    }
+
+    /**
+     * Performs SHA256 on a string
+     *
+     * @param s The string to hash
+     * @return A byte array containing the resulting 32-byte hash
+     */
     public static byte[] sha256(String s) {
         MessageDigest digest = null;
 
@@ -57,33 +62,31 @@ public class Crypto {
 
     /**
      * Encrypt a string using AES256
-     * @param key   the 32-byte key
-     * @param data  the string to encrypt
-     * @return      the encrypted string
+     *
+     * @param key  the 32-byte key
+     * @param data the string to encrypt
+     * @return the encrypted string
      */
-    public static String aes256_enc(byte[] key, String data) {
+    public static String aes256_enc(byte[] key, String data, byte[] pIV) {
 
         Assert.assertEquals(32, key.length); // 32 bytes = 256-bit key
 
         // Create Cipher using "AES" provider
         Cipher cipher = null;
         try {
-            cipher = Cipher.getInstance("AES/OFB/NoPadding");
-        }
-        catch (NoSuchAlgorithmException e) {
+            cipher = Cipher.getInstance("AES/CFB/NoPadding");
+        } catch (NoSuchAlgorithmException e) {
             Log.d("debug", e.toString());
-        }
-        catch (NoSuchPaddingException e) {
+        } catch (NoSuchPaddingException e) {
             Log.d("debug", e.toString());
         }
 
         if (cipher != null) {
             try {
-                cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(sIV));//.getBytes(ENCODER)));
+                cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(pIV));//.getBytes(ENCODER)));
                 byte[] encrypted_data = cipher.doFinal(data.getBytes(ENCODER));
                 return bin2String(encrypted_data);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.d("debug", e.toString());
             }
         }
@@ -93,33 +96,31 @@ public class Crypto {
 
     /**
      * Decrypt a string using AES256
-     * @param key   the 32-byte key
-     * @param data  the string to decrypt
-     * @return      the decrypted string
+     *
+     * @param key  the 32-byte key
+     * @param data the string to decrypt
+     * @return the decrypted string
      */
-    public static String aes256_dec(byte[] key, String data) {
+    public static String aes256_dec(byte[] key, String data, byte[] pIV) {
 
         Assert.assertEquals(32, key.length); // 32 bytes = 256-bit key
 
         // Create Cipher using "AES" provider
         Cipher cipher = null;
         try {
-            cipher = Cipher.getInstance("AES/OFB/NoPadding");
-        }
-        catch (NoSuchAlgorithmException e) {
+            cipher = Cipher.getInstance("AES/CFB/NoPadding");
+        } catch (NoSuchAlgorithmException e) {
             Log.d("debug", e.toString());
-        }
-        catch (NoSuchPaddingException e) {
+        } catch (NoSuchPaddingException e) {
             Log.d("debug", e.toString());
         }
 
         if (cipher != null) {
             try {
-                cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(sIV));//.getBytes(ENCODER)));
-                byte [] decrypted_data = cipher.doFinal(data.getBytes(ENCODER));
+                cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(pIV));//.getBytes(ENCODER)));
+                byte[] decrypted_data = cipher.doFinal(data.getBytes(ENCODER));
                 return bin2String(decrypted_data);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.d("debug", e.toString());
             }
         }
@@ -130,39 +131,36 @@ public class Crypto {
 
     /**
      * HMAC-SHA256 encoding
-     * @param key the 32-byte key to be HMAC
-     * @param data the random string to HMAC the key
-     * @return
+     *
+     * @param key  the 32-byte key to be HMAC
+     * @param data the string to HMAC the key
+     * @return the hmac string
      */
-    public static String hmac_sha256(byte[] key, byte[] data){
+    public static String hmac_sha256(byte[] key, String data) {
         Assert.assertEquals(32, key.length); // 32 bytes = 256-bit key
         Mac mac = null;
         try {
             mac = Mac.getInstance("HmacSHA256");
-
+        } catch (NoSuchAlgorithmException e) {
+            Log.d("debug", e.toString());
         }
-        catch (NoSuchAlgorithmException e){
-            Log.d("debug",e.toString());
-        }
-        if (mac != null){
-            try{
+        if (mac != null) {
+            try {
                 mac.init(new SecretKeySpec(key, "HmacSHA256"));
-                byte[] digest = mac.doFinal(data);
+                byte[] digest = mac.doFinal(data.getBytes(ENCODER));
                 return bin2String(digest);
 
-
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 Log.d("debug", e.toString());
             }
         }
-    return null;
+        return null;
     }
 
 
     // useful for debugging
     public static String bin2hex(byte[] data) {
-        return String.format("%0" + (data.length*2) + "X", new BigInteger(1, data));
+        return String.format("%0" + (data.length * 2) + "X", new BigInteger(1, data));
     }
 
     public static String bin2String(byte[] data) {
@@ -170,18 +168,11 @@ public class Crypto {
 
         try {
             encoded_data = new String(data, ENCODER);
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             Log.d("debug", e.toString());
         }
 
         return encoded_data;
-    }
-
-    //for debugging
-
-    public byte[] get_sIV(){
-        return sIV;
     }
 }
 
