@@ -44,16 +44,9 @@ public class MainActivity extends Activity implements
         setContentView(R.layout.activity_main);
 
         new TestNotes();
-        List<Note> notes = TestNotes.get();
 
         mENDBManagerObject = new ENDBManager(this);
         mENDBManagerObject.openDatabase();
-
-        /* uncomment to make more notes
-        mENDBManagerObject.addNote(notes.get(0));
-        mENDBManagerObject.addNote(notes.get(1));
-        mENDBManagerObject.addNote(notes.get(2));
-        */
     }
 
     @Override
@@ -74,6 +67,7 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onDoneClicked(Note note) {
+        note = encryptNote(note);
         long noteId;
         if (!mENDBManagerObject.updateNoteThroughId(note)) {
             noteId = mENDBManagerObject.addNote(note);
@@ -139,9 +133,16 @@ public class MainActivity extends Activity implements
     public void onFinishEditDialog(String password) {
         mKey = Crypto.sha256(password);
 
+        List<Note> test_notes = TestNotes.get();
+
+        /* uncomment to make more notes */
+        mENDBManagerObject.addNote(encryptNote(test_notes.get(0)));
+        mENDBManagerObject.addNote(encryptNote(test_notes.get(1)));
+        mENDBManagerObject.addNote(encryptNote(test_notes.get(2)));
+
         ArrayList<Note> notes = new ArrayList<Note>();
         for (long id : getAllNotesIdsFromCursor(mENDBManagerObject.getAllNotes()))
-            notes.add(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
+            notes.add(decryptNote(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id))));
 
         getFragmentManager().beginTransaction()
                 .add(R.id.container, NoteListFragment.newInstance(notes))
@@ -159,6 +160,7 @@ public class MainActivity extends Activity implements
         note.setText(contents);
         return note;
     }
+
     private ArrayList<Long> getAllNotesIdsFromCursor(Cursor cursor)
     {
         ArrayList<Long> notesIdList = new ArrayList<Long>();
@@ -169,6 +171,42 @@ public class MainActivity extends Activity implements
             cursor.moveToNext();
         }
         return notesIdList;
+    }
+
+    private Note encryptNote(Note note) {
+        note.setIV(Crypto.getIV());
+        String encrypted_text = Crypto.aes256_enc(mKey, note.getText(), note.getIV());
+        String hmac = Crypto.hmac_sha256(mKey, encrypted_text);
+        note.setText(hmac + encrypted_text);
+        String encrypted_title = Crypto.aes256_enc(mKey, note.getTitle(), note.getIV());
+        hmac = Crypto.hmac_sha256(mKey, encrypted_title);
+        note.setTitle(hmac + encrypted_title);
+
+        return note;
+    }
+
+    private Note decryptNote(Note note) {
+        String encrypted_blob = note.getText();
+        String hmac = encrypted_blob.substring(0, 31);
+        String encrypted_text = encrypted_blob.substring(32);
+        if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_text)))) {
+            note.setTitle("Note decryption failed!");
+            note.setText("Note decryption failed!");
+            return note;
+        }
+        note.setText(Crypto.aes256_dec(mKey, encrypted_text, note.getIV()));
+
+        encrypted_blob = note.getTitle();
+        hmac = encrypted_blob.substring(0, 31);
+        encrypted_text = encrypted_blob.substring(32);
+        if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_text)))) {
+            note.setTitle("Note decryption failed!");
+            note.setText("Note decryption failed!");
+            return note;
+        }
+        note.setTitle(Crypto.aes256_dec(mKey, encrypted_text, note.getIV()));
+
+        return note;
     }
 
 
