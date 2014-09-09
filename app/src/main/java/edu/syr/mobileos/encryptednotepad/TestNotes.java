@@ -38,5 +38,4 @@ public class TestNotes {
         text = "This is yet another note";
         sNoteList.add(new Note(id, title, text));
     }
-
 }
