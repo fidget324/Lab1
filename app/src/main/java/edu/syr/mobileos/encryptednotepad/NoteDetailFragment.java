@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 /**
  * A fragment which displays the details for a given note. These include the note's title,
@@ -19,6 +20,8 @@ public class NoteDetailFragment extends NoteManipulatorFragment {
             "edu.syr.mobileos.encryptednotepad.NoteDetailFragment.note";
 
     private Note mNote;
+    private TextView mTitleView;
+    private TextView mTextView;
 
     public static NoteDetailFragment newInstance(Note note) {
         NoteDetailFragment fragment = new NoteDetailFragment();
@@ -44,7 +47,15 @@ public class NoteDetailFragment extends NoteManipulatorFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_note_detail, container, false);
+        View fragment_view = inflater.inflate(R.layout.fragment_note_detail, container, false);
+
+        mTitleView = (TextView) fragment_view.findViewById(R.id.fragment_note_detail_title);
+        mTextView = (TextView) fragment_view.findViewById(R.id.fragment_note_detail_text);
+
+        mTitleView.setText(mNote.getTitle());
+        mTextView.setText(mNote.getText());
+
+        return fragment_view;
     }
 
 }

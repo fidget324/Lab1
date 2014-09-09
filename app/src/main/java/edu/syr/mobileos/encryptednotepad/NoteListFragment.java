@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class NoteListFragment extends NoteManipulatorFragment {
     private ArrayList<Note> mNotes;
     private OnNoteClickedListener mNoteClickedListener;
     private OnNoteCreateListener mNoteCreateListener;
+    private ArrayAdapter<String> mAdapter;
 
     // TODO: Rename and change types and number of parameters
     public static NoteListFragment newInstance(ArrayList<Note> notes) {
@@ -49,6 +51,16 @@ public class NoteListFragment extends NoteManipulatorFragment {
         if (getArguments() != null) {
             mNotes = (ArrayList<Note>) getArguments().getSerializable(ARG_NOTES);
         }
+
+        ArrayList<String> titles = new ArrayList<String>();
+        for (Note n : mNotes)
+            titles.add(n.getTitle());
+
+        mAdapter = new ArrayAdapter<String>(
+                getActivity(),
+                R.layout.fragment_note_list_entry,
+                R.id.fragment_note_list_entry_title,
+                titles);
     }
 
     @Override
@@ -58,6 +70,8 @@ public class NoteListFragment extends NoteManipulatorFragment {
         View fragment_view = inflater.inflate(R.layout.fragment_note_list, container, false);
 
         ListView listView = (ListView) fragment_view.findViewById(R.id.list);
+
+        listView.setAdapter(mAdapter);
 
         return fragment_view;
     }
