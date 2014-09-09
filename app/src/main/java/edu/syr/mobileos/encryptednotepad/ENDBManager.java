@@ -9,8 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.text.format.Time;
 import android.util.Log;
 
-import java.io.UnsupportedEncodingException;
-
 /**
  * The entirety of the SQLite BACK-END
  * The rest of the App interacts with EncryptedNotesDBManager via the six public methods define in the nested Agent class.
@@ -101,7 +99,7 @@ public class ENDBManager {
     public long addNote(Note note) {
         String title=note.getTitle();
         String eContents=note.getText();
-        String iVector= bin2String(note.getIV());
+        String iVector= StringUtility.bin2String(note.getIV());
         ContentValues initialValues = new ContentValues();
         Time currentTime = new Time();
         currentTime.setToNow();
@@ -152,7 +150,7 @@ public class ENDBManager {
      */
     public boolean updateNoteThroughId(Note note) {
         long noteID= note.getID();
-        String iVector= bin2String(note.getIV()); // We many not need it as we do not need to update the initialization vector
+        String iVector= StringUtility.bin2String(note.getIV()); // We many not need it as we do not need to update the initialization vector
         String title=note.getTitle();
         String eContents=note.getText();
         ContentValues updatedValues = new ContentValues();
@@ -163,30 +161,6 @@ public class ENDBManager {
         updatedValues.put(ENOTE_CONTENTS, eContents);
         updatedValues.put(ENOTE_LM_DATE, currentTime.toString());
         return mDatabase.update(DATABASE_TABLE_NAME, updatedValues, ENOTE_ID + "=" + noteID, null) > 0;
-    }
-    public static String bin2String(byte[] data) {
-        String encoded_data = null;
-
-        try {
-            encoded_data = new String(data, ENCODER);
-        } catch (UnsupportedEncodingException e) {
-            Log.d("debug", e.toString());
-        }
-
-        return encoded_data;
-    }
-
-    public static byte[] string2Bin(String s) {
-        byte[] encoded_data = null;
-
-        try {
-            encoded_data = s.getBytes(ENCODER);
-        }
-        catch (UnsupportedEncodingException e) {
-            Log.d("debug", e.toString());
-        }
-
-        return encoded_data;
     }
 
 }

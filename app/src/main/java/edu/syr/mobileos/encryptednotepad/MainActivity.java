@@ -145,9 +145,11 @@ public class MainActivity extends Activity implements
         long noteId = cursor.getLong(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_ID));
         String title = cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_TITLE));
         String contents = cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_CONTENTS));
+        byte[] iv = StringUtility.string2Bin(cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_IVECTOR)));
         note.setID(noteId);
         note.setTitle(title);
         note.setText(contents);
+        note.setIV(iv);
         return note;
     }
 
@@ -203,7 +205,7 @@ public class MainActivity extends Activity implements
     private void testCrypto() {
         // Example demonstrating the Crypto class
         byte[] key = mKey;
-        Log.d("debug", "key: " + Crypto.bin2hex(key));
+        Log.d("debug", "key: " + StringUtility.bin2hex(key));
         String plaintext = "123456789101112131415161718192021222324252627282930313233343536";
 
         byte[] sIV = Crypto.getIV();

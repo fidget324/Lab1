@@ -4,8 +4,6 @@ import android.util.Log;
 
 import junit.framework.Assert;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -21,12 +19,9 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class Crypto {
 
-    private static final String ENCODER = "ISO-8859-1";
-
     /**
      * offer a 16-byte IV for each note, since the block size in AES is 16 bytes
      */
-
     public static byte[] getIV() {
         int length = 16;
         byte[] buf = new byte[length];
@@ -81,8 +76,8 @@ public class Crypto {
         if (cipher != null) {
             try {
                 cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(pIV));//.getBytes(ENCODER)));
-                byte[] encrypted_data = cipher.doFinal(data.getBytes(ENCODER));
-                return bin2String(encrypted_data);
+                byte[] encrypted_data = cipher.doFinal(data.getBytes(StringUtility.ENCODER));
+                return StringUtility.bin2String(encrypted_data);
             } catch (Exception e) {
                 Log.d("debug", e.toString());
             }
@@ -115,8 +110,8 @@ public class Crypto {
         if (cipher != null) {
             try {
                 cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(pIV));//.getBytes(ENCODER)));
-                byte[] decrypted_data = cipher.doFinal(data.getBytes(ENCODER));
-                return bin2String(decrypted_data);
+                byte[] decrypted_data = cipher.doFinal(data.getBytes(StringUtility.ENCODER));
+                return StringUtility.bin2String(decrypted_data);
             } catch (Exception e) {
                 Log.d("debug", e.toString());
             }
@@ -144,45 +139,14 @@ public class Crypto {
         if (mac != null) {
             try {
                 mac.init(new SecretKeySpec(key, "HmacSHA256"));
-                byte[] digest = mac.doFinal(data.getBytes(ENCODER));
-                return bin2String(digest);
+                byte[] digest = mac.doFinal(data.getBytes(StringUtility.ENCODER));
+                return StringUtility.bin2String(digest);
 
             } catch (Exception e) {
                 Log.d("debug", e.toString());
             }
         }
         return null;
-    }
-
-
-    // useful for debugging
-    public static String bin2hex(byte[] data) {
-        return String.format("%0" + (data.length * 2) + "X", new BigInteger(1, data));
-    }
-
-    public static String bin2String(byte[] data) {
-        String encoded_data = null;
-
-        try {
-            encoded_data = new String(data, ENCODER);
-        } catch (UnsupportedEncodingException e) {
-            Log.d("debug", e.toString());
-        }
-
-        return encoded_data;
-    }
-
-    public static byte[] string2Bin(String s) {
-        byte[] encoded_data = null;
-
-        try {
-            encoded_data = s.getBytes(ENCODER);
-        }
-        catch (UnsupportedEncodingException e) {
-            Log.d("debug", e.toString());
-        }
-
-        return encoded_data;
     }
 }
 
