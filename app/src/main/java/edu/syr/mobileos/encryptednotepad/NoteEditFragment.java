@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 /**
  * A fragment which allows a new note to be created, or an already existing note to be edited.
@@ -18,7 +20,11 @@ public class NoteEditFragment extends Fragment {
             "edu.syr.mobileos.encryptednotepad.NoteEditFragment.note";
 
     private OnDoneClickedListener mDoneListener;
-    private long mNoteID;
+    private Note mNote;
+    private EditText mEditTitle;
+    private EditText mEditText;
+    private Button mDoneButton;
+    private boolean mCreateNewNote;
 
     /**
      * For editing an already existing note
@@ -50,10 +56,11 @@ public class NoteEditFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) { // editing an existing note
-            mNoteID = getArguments().getLong(ARG_NOTE);
+            mNote = (Note) getArguments().getSerializable(ARG_NOTE);
+            mCreateNewNote = false;
         }
         else { // creating a new note
-
+            mCreateNewNote = true;
         }
     }
 
@@ -61,7 +68,26 @@ public class NoteEditFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_note_edit, container, false);
+        View fragment_view = inflater.inflate(R.layout.fragment_note_edit, container, false);
+
+        mEditTitle = (EditText) fragment_view.findViewById(R.id.fragment_note_edit_title);
+        mEditText = (EditText) fragment_view.findViewById(R.id.fragment_note_edit_text);
+        mDoneButton = (Button) fragment_view.findViewById(R.id.fragment_note_edit_done_button);
+        mDoneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mNote.setTitle(mEditTitle.getText().toString());
+                mNote.setText(mEditText.getText().toString());
+                mDoneListener.onDoneClicked(mNote);
+            }
+        });
+
+        if (!mCreateNewNote) {
+            mEditText.setText(mNote.getTitle());
+            mEditTitle.setText(mNote.getText());
+        }
+
+        return fragment_view;
     }
 
     @Override

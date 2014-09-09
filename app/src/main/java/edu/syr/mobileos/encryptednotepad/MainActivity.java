@@ -112,7 +112,7 @@ public class MainActivity extends Activity implements
             case Note.ACTION_DELETE:
                 mENDBManagerObject.deleteNote(note.getID());
                 ArrayList<Note> notes = new ArrayList<Note>();
-                Cursor cursor= mENDBManagerObject.getAllNotes();
+                Cursor cursor = mENDBManagerObject.getAllNotes();
                 for (long id : getAllNotesIdsFromCursor(cursor))
                     notes.add(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
                 getFragmentManager().beginTransaction()
