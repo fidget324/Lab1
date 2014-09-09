@@ -1,18 +1,23 @@
 package edu.syr.mobileos.encryptednotepad;
+
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-import android.database.SQLException;
-import android.content.ContentValues;
-import android.database.Cursor;
 import android.text.format.Time;
+import android.util.Log;
+
+import java.io.UnsupportedEncodingException;
+
 /**
  * The entirety of the SQLite BACK-END
  * The rest of the App interacts with EncryptedNotesDBManager via the six public methods define in the nested Agent class.
  * DOES NOT USE RAW QUERIES.
  */
 public class ENDBManager {
+    private static final String ENCODER = "ISO-8859-1";
     // Declaring database level details
 
     private static final String DATABASE_NAME = "Notepad";
@@ -48,7 +53,7 @@ public class ENDBManager {
         DatabaseAgent(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
-        // Creating a table in the created database
+        // Creating a table in the created database 
         @Override
         public void onCreate(SQLiteDatabase database)
         {
@@ -96,7 +101,7 @@ public class ENDBManager {
     public long addNote(Note note) {
         String title=note.getTitle();
         String eContents=note.getText();
-        String iVector= note.getIV();
+        String iVector= bin2String(note.getIV());
         ContentValues initialValues = new ContentValues();
         Time currentTime = new Time();
         currentTime.setToNow();
@@ -129,7 +134,7 @@ public class ENDBManager {
 
         String ColumnList[]= {ENOTE_ID, ENOTE_IVECTOR, ENOTE_TITLE, ENOTE_CONTENTS, ENOTE_LM_DATE};
 
-        Cursor cursorAtGivenNoteId =mDatabase.query(true, DATABASE_TABLE_NAME, new String[] {ColumnList}, ENOTE_ID + "=" + noteId, null,
+        Cursor cursorAtGivenNoteId =mDatabase.query(true, DATABASE_TABLE_NAME, ColumnList, ENOTE_ID + "=" + noteId, null,
                 null, null, null, null);
         if (cursorAtGivenNoteId != null) {
             cursorAtGivenNoteId.moveToFirst();
@@ -147,7 +152,7 @@ public class ENDBManager {
      */
     public boolean updateNoteThroughId(Note note) {
         long noteID= note.getID();
-        String iVector= note.getIV(); // We many not need it as we do not need to update the initialization vector
+        String iVector= bin2String(note.getIV()); // We many not need it as we do not need to update the initialization vector
         String title=note.getTitle();
         String eContents=note.getText();
         ContentValues updatedValues = new ContentValues();
@@ -159,6 +164,29 @@ public class ENDBManager {
         updatedValues.put(ENOTE_LM_DATE, currentTime.toString());
         return mDatabase.update(DATABASE_TABLE_NAME, updatedValues, ENOTE_ID + "=" + noteID, null) > 0;
     }
+    public static String bin2String(byte[] data) {
+        String encoded_data = null;
 
+        try {
+            encoded_data = new String(data, ENCODER);
+        } catch (UnsupportedEncodingException e) {
+            Log.d("debug", e.toString());
+        }
+
+        return encoded_data;
+    }
+
+    public static byte[] string2Bin(String s) {
+        byte[] encoded_data = null;
+
+        try {
+            encoded_data = s.getBytes(ENCODER);
+        }
+        catch (UnsupportedEncodingException e) {
+            Log.d("debug", e.toString());
+        }
+
+        return encoded_data;
+    }
 
 }
