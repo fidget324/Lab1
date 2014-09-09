@@ -17,6 +17,9 @@ public class Note implements Serializable {
     private String mText;
     private byte[] mIV;
 
+    public Note() {
+    }
+
     public Note(String title, String text) {
         mID = 0;
         mTitle = title;

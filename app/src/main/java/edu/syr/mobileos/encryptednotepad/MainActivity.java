@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.database.Cursor;
 
 import java.util.ArrayList;
 
@@ -18,6 +19,7 @@ public class MainActivity extends Activity implements
 {
 
     private byte[] mKey;
+    private ENDBManager ENDBManagerObject;
 
     @Override
     protected void onStart() {
@@ -62,11 +64,16 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onDoneClicked(Note note) {
-        long note_id;
-        if ((note_id = NoteDB.Agent.updateNote(note)) == -1) {
-            note_id = NoteDB.Agent.addNote(note);
+        long noteId;
+        if (!ENDBManagerObject.updateNoteThroughId(note)) {
+            noteId = ENDBManagerObject.addNote(note);
         }
-        Note new_note = NoteDB.Agent.getNote(note_id);
+        else
+        {
+            noteId=note.getID();
+        }
+
+        Note new_note = getNoteThroughCursor(ENDBManagerObject.getNoteThroughId(noteId));
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, NoteDetailFragment.newInstance(new_note))
                 .commit();
@@ -90,21 +97,23 @@ public class MainActivity extends Activity implements
     public void onNoteInteraction(int action, Note note) {
         switch (action) {
             case Note.ACTION_DELETE:
-                NoteDB.Agent.deleteNote(note.getID());
+                ENDBManagerObject.deleteNote(note.getID());
                 ArrayList<Note> notes = new ArrayList<Note>();
-                for (long id : NoteDB.Agent.getAllNotes())
-                    notes.add(NoteDB.Agent.getNote(id));
+                Cursor cursor=ENDBManagerObject.getAllNotes();
+                for (long id : getAllNotesIdsFromCursor(cursor))
+                    notes.add(getNoteThroughCursor(ENDBManagerObject.getNoteThroughId(id)));
                 getFragmentManager().beginTransaction()
                         .replace(R.id.container, NoteListFragment.newInstance(notes))
                         .commit();
                 break;
             case Note.ACTION_EDIT:
                 long note_id;
-                if ((note_id = NoteDB.Agent.updateNote(note)) == -1) {
+                if (!ENDBManagerObject.updateNoteThroughId(note)) {
                     Log.d("MainActivity", "tried to update a note which doesn't exist in DB");
                 }
                 else {
-                    Note new_note = NoteDB.Agent.getNote(note_id);
+                    note_id=note.getID();
+                    Note new_note = getNoteThroughCursor(ENDBManagerObject.getNoteThroughId(note_id));
                     getFragmentManager().beginTransaction()
                             .replace(R.id.container, NoteEditFragment.newInstance(new_note))
                             .commit();
@@ -118,13 +127,37 @@ public class MainActivity extends Activity implements
         mKey = Crypto.sha256(password);
 
         ArrayList<Note> notes = new ArrayList<Note>();
-        for (long id : NoteDB.Agent.getAllNotes())
-            notes.add(NoteDB.Agent.getNote(id));
+        for (long id : getAllNotesIdsFromCursor(ENDBManagerObject.getAllNotes()))
+            notes.add(getNoteThroughCursor(ENDBManagerObject.getNoteThroughId(id)));
 
         getFragmentManager().beginTransaction()
                 .add(R.id.container, NoteListFragment.newInstance(notes))
                 .commit();
     }
+
+    private Note getNoteThroughCursor(Cursor cursor)
+    {
+        Note note = new Note();
+        long noteId = cursor.getLong(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_ID));
+        String title = cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_TITLE));
+        String contents = cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_CONTENTS));
+        note.setID(noteId);
+        note.setTitle(title);
+        note.setText(contents);
+        return note;
+    }
+    private ArrayList<Long> getAllNotesIdsFromCursor(Cursor cursor)
+    {
+        ArrayList<Long> notesIdList = new ArrayList<Long>();
+        cursor.moveToFirst();
+        while (cursor.isAfterLast() == false)
+        {
+            notesIdList.add(cursor.getLong(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_ID)));
+            cursor.moveToNext();
+        }
+        return notesIdList;
+    }
+
 
     // test function, please ignore
     private void testCrypto() {
