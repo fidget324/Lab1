@@ -209,7 +209,6 @@ public class MainActivity extends Activity implements
         return note;
     }
 
-
     // test function, please ignore
     private void testCrypto() {
         // Example demonstrating the Crypto class
