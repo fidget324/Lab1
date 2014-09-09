@@ -60,6 +60,7 @@ public class NoteEditFragment extends Fragment {
             mCreateNewNote = false;
         }
         else { // creating a new note
+            mNote = new Note();
             mCreateNewNote = true;
         }
     }
@@ -83,8 +84,12 @@ public class NoteEditFragment extends Fragment {
         });
 
         if (!mCreateNewNote) {
-            mEditText.setText(mNote.getTitle());
-            mEditTitle.setText(mNote.getText());
+            mEditTitle.setText(mNote.getTitle());
+            mEditText.setText(mNote.getText());
+        }
+        else {
+            mEditTitle.setText("Enter title");
+            mEditText.setText("Enter text");
         }
 
         return fragment_view;

@@ -2,6 +2,9 @@ package edu.syr.mobileos.encryptednotepad;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -38,6 +41,7 @@ public class NoteDetailFragment extends NoteManipulatorFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         if (getArguments() != null) {
             mNote = (Note) getArguments().getSerializable(ARG_NOTE);
         }
@@ -56,6 +60,28 @@ public class NoteDetailFragment extends NoteManipulatorFragment {
         mTextView.setText(mNote.getText());
 
         return fragment_view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_note_detail, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_edit_note:
+                mInteractionListener.onNoteInteraction(Note.ACTION_EDIT, mNote);
+                break;
+            case R.id.action_delete_note:
+                mInteractionListener.onNoteInteraction(Note.ACTION_DELETE, mNote);
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }
