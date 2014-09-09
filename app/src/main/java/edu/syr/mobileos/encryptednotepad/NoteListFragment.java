@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -72,6 +73,12 @@ public class NoteListFragment extends NoteManipulatorFragment {
         ListView listView = (ListView) fragment_view.findViewById(R.id.list);
 
         listView.setAdapter(mAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                mNoteClickedListener.onNoteClicked(mNotes.get(i));
+            }
+        });
 
         return fragment_view;
     }

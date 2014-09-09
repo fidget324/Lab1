@@ -1,13 +1,14 @@
 package edu.syr.mobileos.encryptednotepad;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.database.Cursor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends Activity implements
@@ -19,7 +20,7 @@ public class MainActivity extends Activity implements
 {
 
     private byte[] mKey;
-    private ENDBManager ENDBManagerObject;
+    private ENDBManager mENDBManagerObject;
 
     @Override
     protected void onStart() {
@@ -33,6 +34,7 @@ public class MainActivity extends Activity implements
         super.onStop();
         for (int i = 0; i < mKey.length; i++)
             mKey[i] = 0;
+        mENDBManagerObject.closeDatabase();
         finish();
     }
 
@@ -42,7 +44,16 @@ public class MainActivity extends Activity implements
         setContentView(R.layout.activity_main);
 
         new TestNotes();
-        TestNotes.get();
+        List<Note> notes = TestNotes.get();
+
+        mENDBManagerObject = new ENDBManager(this);
+        mENDBManagerObject.openDatabase();
+
+        /* uncomment to make more notes
+        mENDBManagerObject.addNote(notes.get(0));
+        mENDBManagerObject.addNote(notes.get(1));
+        mENDBManagerObject.addNote(notes.get(2));
+        */
     }
 
     @Override
@@ -64,17 +75,18 @@ public class MainActivity extends Activity implements
     @Override
     public void onDoneClicked(Note note) {
         long noteId;
-        if (!ENDBManagerObject.updateNoteThroughId(note)) {
-            noteId = ENDBManagerObject.addNote(note);
+        if (!mENDBManagerObject.updateNoteThroughId(note)) {
+            noteId = mENDBManagerObject.addNote(note);
         }
         else
         {
             noteId=note.getID();
         }
 
-        Note new_note = getNoteThroughCursor(ENDBManagerObject.getNoteThroughId(noteId));
+        Note new_note = getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(noteId));
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, NoteDetailFragment.newInstance(new_note))
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -82,6 +94,7 @@ public class MainActivity extends Activity implements
     public void onNoteClicked(Note note) {
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, NoteDetailFragment.newInstance(note))
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -89,6 +102,7 @@ public class MainActivity extends Activity implements
     public void onNoteCreateClicked() {
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, NoteEditFragment.newInstance())
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -96,25 +110,27 @@ public class MainActivity extends Activity implements
     public void onNoteInteraction(int action, Note note) {
         switch (action) {
             case Note.ACTION_DELETE:
-                ENDBManagerObject.deleteNote(note.getID());
+                mENDBManagerObject.deleteNote(note.getID());
                 ArrayList<Note> notes = new ArrayList<Note>();
-                Cursor cursor=ENDBManagerObject.getAllNotes();
+                Cursor cursor= mENDBManagerObject.getAllNotes();
                 for (long id : getAllNotesIdsFromCursor(cursor))
-                    notes.add(getNoteThroughCursor(ENDBManagerObject.getNoteThroughId(id)));
+                    notes.add(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
                 getFragmentManager().beginTransaction()
                         .replace(R.id.container, NoteListFragment.newInstance(notes))
+                        .addToBackStack(null)
                         .commit();
                 break;
             case Note.ACTION_EDIT:
                 long note_id;
-                if (!ENDBManagerObject.updateNoteThroughId(note)) {
+                if (!mENDBManagerObject.updateNoteThroughId(note)) {
                     Log.d("MainActivity", "tried to update a note which doesn't exist in DB");
                 }
                 else {
                     note_id=note.getID();
-                    Note new_note = getNoteThroughCursor(ENDBManagerObject.getNoteThroughId(note_id));
+                    Note new_note = getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(note_id));
                     getFragmentManager().beginTransaction()
                             .replace(R.id.container, NoteEditFragment.newInstance(new_note))
+                            .addToBackStack(null)
                             .commit();
                 }
                 break;
@@ -126,8 +142,8 @@ public class MainActivity extends Activity implements
         mKey = Crypto.sha256(password);
 
         ArrayList<Note> notes = new ArrayList<Note>();
-        for (long id : getAllNotesIdsFromCursor(ENDBManagerObject.getAllNotes()))
-            notes.add(getNoteThroughCursor(ENDBManagerObject.getNoteThroughId(id)));
+        for (long id : getAllNotesIdsFromCursor(mENDBManagerObject.getAllNotes()))
+            notes.add(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
 
         getFragmentManager().beginTransaction()
                 .add(R.id.container, NoteListFragment.newInstance(notes))
