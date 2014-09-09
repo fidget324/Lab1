@@ -14,19 +14,21 @@ import android.text.format.Time;
  */
 public class ENDBManager {
     // Declaring database level details
+
     private static final String DATABASE_NAME = "Notepad";
     private static final String DATABASE_TABLE_NAME = "EncryptedNote";
-    private static final String DATABASE_CREATE_QUERY="CREATE TABLE "+DATABASE_TABLE_NAME+ " (NoteID INTEGER PRIMARY KEY AUTOINCREMENT, NoteTitle TEXT NOT NULL, NoteContents TEXT NOT NULL, LastModifiedDate DATE DEFAULT CURRENT_DATE);";
+    private static final String DATABASE_CREATE_QUERY="CREATE TABLE "+DATABASE_TABLE_NAME+ " (NoteID INTEGER PRIMARY KEY AUTOINCREMENT, IVector TEXT NOT NULL, NoteTitle TEXT NOT NULL, NoteContents TEXT NOT NULL, LastModifiedDate DATE DEFAULT CURRENT_DATE);";
     private static final int DATABASE_VERSION = 2;
 
     // Note level attributes
+    public static final String ENOTE_IVECTOR = "IVector";
     public static final String ENOTE_ID = "NoteID";
     public static final String ENOTE_TITLE = "NoteTitle";
     public static final String ENOTE_CONTENTS = "NoteContents";
     public static final String ENOTE_LM_DATE="LastModifiedDate";
 
     // Declaring TAG for logging purpose
-    private static final String TAG = "EncryptedNotesDBManager";
+    private static final String TAG = "ENDBManager";
 
     private DatabaseAgent mDatabaseAgent;
     private SQLiteDatabase mDatabase;
@@ -46,7 +48,7 @@ public class ENDBManager {
         DatabaseAgent(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
-        // Creating a table in the created database 
+        // Creating a table in the created database
         @Override
         public void onCreate(SQLiteDatabase database)
         {
@@ -94,9 +96,11 @@ public class ENDBManager {
     public long addNote(Note note) {
         String title=note.getTitle();
         String eContents=note.getText();
+        String iVector= note.getIV();
         ContentValues initialValues = new ContentValues();
         Time currentTime = new Time();
         currentTime.setToNow();
+        initialValues.put(ENOTE_IVECTOR, iVector);
         initialValues.put(ENOTE_TITLE, title);
         initialValues.put(ENOTE_CONTENTS, eContents);
         initialValues.put(ENOTE_LM_DATE, currentTime.toString());
@@ -115,7 +119,7 @@ public class ENDBManager {
     // A Cursor will be returned by this function
     // This method will be used for implementing the view Notes and Search for the note
     public Cursor getAllNotes() {
-        String ColumnList[]= {ENOTE_ID, ENOTE_TITLE, ENOTE_CONTENTS, ENOTE_LM_DATE};
+        String ColumnList[]= {ENOTE_ID, ENOTE_IVECTOR, ENOTE_TITLE, ENOTE_CONTENTS, ENOTE_LM_DATE};
         return mDatabase.query(DATABASE_TABLE_NAME, ColumnList , null, null, null, null, ENOTE_LM_DATE);
     }
     /*
@@ -123,8 +127,9 @@ public class ENDBManager {
     */
     public Cursor getNoteThroughId(long noteId) throws SQLException {
 
-        Cursor cursorAtGivenNoteId =mDatabase.query(true, DATABASE_TABLE_NAME, new String[] {ENOTE_ID,
-                        ENOTE_TITLE, ENOTE_CONTENTS,ENOTE_LM_DATE}, ENOTE_ID + "=" + noteId, null,
+        String ColumnList[]= {ENOTE_ID, ENOTE_IVECTOR, ENOTE_TITLE, ENOTE_CONTENTS, ENOTE_LM_DATE};
+
+        Cursor cursorAtGivenNoteId =mDatabase.query(true, DATABASE_TABLE_NAME, new String[] {ColumnList}, ENOTE_ID + "=" + noteId, null,
                 null, null, null, null);
         if (cursorAtGivenNoteId != null) {
             cursorAtGivenNoteId.moveToFirst();
@@ -142,11 +147,13 @@ public class ENDBManager {
      */
     public boolean updateNoteThroughId(Note note) {
         long noteID= note.getID();
+        String iVector= note.getIV(); // We many not need it as we do not need to update the initialization vector
         String title=note.getTitle();
         String eContents=note.getText();
         ContentValues updatedValues = new ContentValues();
         Time currentTime = new Time();
         currentTime.setToNow();
+        updatedValues.put(ENOTE_IVECTOR, iVector); // We many not need it as we do not need to update the initialization vector
         updatedValues.put(ENOTE_TITLE, title);
         updatedValues.put(ENOTE_CONTENTS, eContents);
         updatedValues.put(ENOTE_LM_DATE, currentTime.toString());
