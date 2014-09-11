@@ -34,6 +34,7 @@ public class MainActivity extends Activity implements
         for (int i = 0; i < mKey.length; i++)
             mKey[i] = 0;
         mENDBManagerObject.closeDatabase();
+        TestNotes.clear();
         finish();
     }
 
@@ -124,6 +125,9 @@ public class MainActivity extends Activity implements
         mKey = Crypto.sha256(password);
 
         List<Note> test_notes = TestNotes.get();
+        Log.d("debug", test_notes.get(0).getText());
+        Log.d("debug", test_notes.get(1).getText());
+        Log.d("debug", test_notes.get(2).getText());
 
         /* uncomment to make more notes */
         mENDBManagerObject.addNote(encryptNote(test_notes.get(0)));
@@ -166,7 +170,8 @@ public class MainActivity extends Activity implements
     }
 
     private Note encryptNote(Note note) {
-        note.setIV(Crypto.getIV());
+        byte[] iv = Crypto.getIV();
+        note.setIV(iv);
         String encrypted_text = Crypto.aes256_enc(mKey, note.getText(), note.getIV());
         String hmac = Crypto.hmac_sha256(mKey, encrypted_text);
         note.setText(hmac + encrypted_text);
@@ -179,17 +184,19 @@ public class MainActivity extends Activity implements
 
     private Note decryptNote(Note note) {
         String encrypted_blob = note.getText();
-        String hmac = encrypted_blob.substring(0, 31);
+        String hmac = encrypted_blob.substring(0, 32);
         String encrypted_text = encrypted_blob.substring(32);
         if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_text)))) {
             note.setTitle("Note decryption failed!");
             note.setText("Note decryption failed!");
             return note;
         }
-        note.setText(Crypto.aes256_dec(mKey, encrypted_text, note.getIV()));
+        byte[] iv = note.getIV();
+        String decrypted_text = Crypto.aes256_dec(mKey, encrypted_text, iv);
+        note.setText(decrypted_text);
 
         encrypted_blob = note.getTitle();
-        hmac = encrypted_blob.substring(0, 31);
+        hmac = encrypted_blob.substring(0, 32);
         encrypted_text = encrypted_blob.substring(32);
         if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_text)))) {
             note.setTitle("Note decryption failed!");

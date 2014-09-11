@@ -1,5 +1,7 @@
 package edu.syr.mobileos.encryptednotepad;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,25 +19,26 @@ public class TestNotes {
     }
 
     private static void createNoteList() {
-        long id;
+        Log.d("debug", "createNoteList()");
         String title;
         String text;
 
         sNoteList = new ArrayList<Note>();
 
-        id = 0;
         title = "Note 1";
         text = "This is a note";
-        sNoteList.add(new Note(id, title, text));
+        sNoteList.add(new Note(title, text));
 
-        id = 1;
         title = "Note 2";
         text = "This is another note";
-        sNoteList.add(new Note(id, title, text));
+        sNoteList.add(new Note(title, text));
 
-        id = 2;
         title = "Note 3";
         text = "This is yet another note";
-        sNoteList.add(new Note(id, title, text));
+        sNoteList.add(new Note(title, text));
+    }
+
+    public static void clear() {
+        sNoteList = null;
     }
 }
