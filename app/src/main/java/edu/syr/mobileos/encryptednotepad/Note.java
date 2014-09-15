@@ -15,7 +15,8 @@ public class Note implements Serializable {
     private long mID;
     private String mTitle;
     private String mText;
-    private byte[] mIV;
+    private byte[] mIVTitle;
+    private byte[] mIVText;
 
     public Note() {
     }
@@ -58,11 +59,19 @@ public class Note implements Serializable {
         mText = text;
     }
 
-    public byte[] getIV() {
-        return mIV;
+    public byte[] getIVTitle() {
+        return mIVTitle;
     }
 
-    public void setIV(byte[] IV) {
-        mIV = IV;
+    public void setIVTitle(byte[] IVTitle) {
+        mIVTitle = IVTitle;
+    }
+
+    public byte[] getIVText() {
+        return mIVText;
+    }
+
+    public void setIVText(byte[] IVText) {
+        mIVText = IVText;
     }
 }
