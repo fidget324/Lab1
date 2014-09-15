@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,6 @@ public class MainActivity extends Activity implements
 
     private byte[] mKey;
     private ENDBManager mENDBManagerObject;
-    private ArrayList<Note> mNotes;
 
     @Override
     protected void onStart() {
@@ -36,7 +34,6 @@ public class MainActivity extends Activity implements
         for (int i = 0; i < mKey.length; i++)
             mKey[i] = 0;
         mENDBManagerObject.closeDatabase();
-        TestNotes.clear();
         finish();
     }
 
@@ -44,9 +41,6 @@ public class MainActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
 
         new TestNotes();
 
@@ -62,19 +56,6 @@ public class MainActivity extends Activity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.container, NoteListFragment.newInstance(mNotes))
-                        .addToBackStack(null)
-                        .commit();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onDoneClicked(Note note) {
         note = encryptNote(note);
         long noteId;
@@ -83,12 +64,12 @@ public class MainActivity extends Activity implements
         }
         else
         {
-            noteId = note.getID();
+            noteId=note.getID();
         }
 
         Note new_note = getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(noteId));
         getFragmentManager().beginTransaction()
-                .replace(R.id.container, NoteDetailFragment.newInstance(decryptNote(new_note)))
+                .replace(R.id.container, NoteDetailFragment.newInstance(new_note))
                 .addToBackStack(null)
                 .commit();
     }
@@ -105,7 +86,6 @@ public class MainActivity extends Activity implements
     public void onNoteCreateClicked() {
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, NoteEditFragment.newInstance())
-                .addToBackStack(null)
                 .commit();
     }
 
@@ -114,12 +94,12 @@ public class MainActivity extends Activity implements
         switch (action) {
             case Note.ACTION_DELETE:
                 mENDBManagerObject.deleteNote(note.getID());
-                mNotes = new ArrayList<Note>();
+                ArrayList<Note> notes = new ArrayList<Note>();
                 Cursor cursor = mENDBManagerObject.getAllNotes();
                 for (long id : getAllNotesIdsFromCursor(cursor))
-                    mNotes.add(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
+                    notes.add(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
                 getFragmentManager().beginTransaction()
-                        .replace(R.id.container, NoteListFragment.newInstance(mNotes))
+                        .replace(R.id.container, NoteListFragment.newInstance(notes))
                         .addToBackStack(null)
                         .commit();
                 break;
@@ -133,7 +113,6 @@ public class MainActivity extends Activity implements
                     Note new_note = getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(note_id));
                     getFragmentManager().beginTransaction()
                             .replace(R.id.container, NoteEditFragment.newInstance(new_note))
-                            .addToBackStack(null)
                             .commit();
                 }
                 break;
@@ -145,25 +124,18 @@ public class MainActivity extends Activity implements
         mKey = Crypto.sha256(password);
 
         List<Note> test_notes = TestNotes.get();
-        Log.d("debug", test_notes.get(0).getText());
-        Log.d("debug", test_notes.get(1).getText());
-        Log.d("debug", test_notes.get(2).getText());
 
         /* uncomment to make more notes */
         mENDBManagerObject.addNote(encryptNote(test_notes.get(0)));
         mENDBManagerObject.addNote(encryptNote(test_notes.get(1)));
         mENDBManagerObject.addNote(encryptNote(test_notes.get(2)));
 
-        mNotes = new ArrayList<Note>();
-        Note note;
-        for (long id : getAllNotesIdsFromCursor(mENDBManagerObject.getAllNotes())) {
-            note = decryptNote(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
-            if (note != null)
-                mNotes.add(note);
-        }
+        ArrayList<Note> notes = new ArrayList<Note>();
+        for (long id : getAllNotesIdsFromCursor(mENDBManagerObject.getAllNotes()))
+            notes.add(decryptNote(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id))));
 
         getFragmentManager().beginTransaction()
-                .add(R.id.container, NoteListFragment.newInstance(mNotes))
+                .add(R.id.container, NoteListFragment.newInstance(notes))
                 .commit();
     }
 
@@ -194,8 +166,7 @@ public class MainActivity extends Activity implements
     }
 
     private Note encryptNote(Note note) {
-        byte[] iv = Crypto.getIV();
-        note.setIV(iv);
+        note.setIV(Crypto.getIV());
         String encrypted_text = Crypto.aes256_enc(mKey, note.getText(), note.getIV());
         String hmac = Crypto.hmac_sha256(mKey, encrypted_text);
         note.setText(hmac + encrypted_text);
@@ -208,20 +179,22 @@ public class MainActivity extends Activity implements
 
     private Note decryptNote(Note note) {
         String encrypted_blob = note.getText();
-        String hmac = encrypted_blob.substring(0, 32);
+        String hmac = encrypted_blob.substring(0, 31);
         String encrypted_text = encrypted_blob.substring(32);
         if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_text)))) {
-            return null;
+            note.setTitle("Title decryption failed!");
+            note.setText("Password is incorrect. Try Again!");
+            return note;
         }
-        byte[] iv = note.getIV();
-        String decrypted_text = Crypto.aes256_dec(mKey, encrypted_text, iv);
-        note.setText(decrypted_text);
+        note.setText(Crypto.aes256_dec(mKey, encrypted_text, note.getIV()));
 
         encrypted_blob = note.getTitle();
-        hmac = encrypted_blob.substring(0, 32);
+        hmac = encrypted_blob.substring(0, 31);
         encrypted_text = encrypted_blob.substring(32);
         if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_text)))) {
-            return null;
+            note.setTitle("Note decryption failed!");
+            note.setText("Note decryption failed!");
+            return note;
         }
         note.setTitle(Crypto.aes256_dec(mKey, encrypted_text, note.getIV()));
 

@@ -128,10 +128,11 @@ public class Crypto {
      * @param data the string to HMAC the key
      * @return the hmac string
      */
-    public static String hmac_sha256(byte[] key, String data) {
+    public static String hmac_sha256(byte[] key, String data)
+    {
         Assert.assertEquals(32, key.length); // 32 bytes = 256-bit key
         Mac mac = null;
-        String digestString = null;
+        String digestString=null;
         try {
             mac = Mac.getInstance("HmacSHA256");
         } catch (NoSuchAlgorithmException e) {
@@ -142,13 +143,14 @@ public class Crypto {
                 mac.init(new SecretKeySpec(key, "HmacSHA256"));
                 byte[] digest = mac.doFinal(data.getBytes(StringUtility.ENCODER));
                 digestString = StringUtility.bin2String(digest);
+                return digestString;
 
             } catch (Exception e) {
                 Log.d("debug", e.toString());
             }
         }
         return digestString;
+
     }
 }
-
 
