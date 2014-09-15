@@ -65,7 +65,7 @@ public class MainActivity extends Activity implements
         }
         else
         {
-            noteId=note.getID();
+            noteId = note.getID();
         }
 
         Note new_note = getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(noteId));
@@ -135,8 +135,12 @@ public class MainActivity extends Activity implements
         mENDBManagerObject.addNote(encryptNote(test_notes.get(2)));
 
         ArrayList<Note> notes = new ArrayList<Note>();
-        for (long id : getAllNotesIdsFromCursor(mENDBManagerObject.getAllNotes()))
-            notes.add(decryptNote(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id))));
+        Note note;
+        for (long id : getAllNotesIdsFromCursor(mENDBManagerObject.getAllNotes())) {
+            note = decryptNote(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
+            if (note != null)
+                notes.add(note);
+        }
 
         getFragmentManager().beginTransaction()
                 .add(R.id.container, NoteListFragment.newInstance(notes))
@@ -187,9 +191,7 @@ public class MainActivity extends Activity implements
         String hmac = encrypted_blob.substring(0, 32);
         String encrypted_text = encrypted_blob.substring(32);
         if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_text)))) {
-            note.setTitle("Note decryption failed!");
-            note.setText("Note decryption failed!");
-            return note;
+            return null;
         }
         byte[] iv = note.getIV();
         String decrypted_text = Crypto.aes256_dec(mKey, encrypted_text, iv);
@@ -199,9 +201,7 @@ public class MainActivity extends Activity implements
         hmac = encrypted_blob.substring(0, 32);
         encrypted_text = encrypted_blob.substring(32);
         if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_text)))) {
-            note.setTitle("Note decryption failed!");
-            note.setText("Note decryption failed!");
-            return note;
+            return null;
         }
         note.setTitle(Crypto.aes256_dec(mKey, encrypted_text, note.getIV()));
 
