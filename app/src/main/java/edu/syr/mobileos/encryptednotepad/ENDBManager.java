@@ -21,7 +21,7 @@ public class ENDBManager {
     private static final String DATABASE_NAME = "Notepad";
     private static final String DATABASE_TABLE_NAME = "EncryptedNote";
     private static final String DATABASE_CREATE_QUERY="CREATE TABLE "+DATABASE_TABLE_NAME+ " (NoteID INTEGER PRIMARY KEY AUTOINCREMENT, IVector TEXT NOT NULL, NoteTitle TEXT NOT NULL, NoteContents TEXT NOT NULL, LastModifiedDate DATE DEFAULT CURRENT_DATE);";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 5;
 
     // Note level attributes
     public static final String ENOTE_IVECTOR = "IVector";
@@ -123,7 +123,7 @@ public class ENDBManager {
     // This method will be used for implementing the view Notes and Search for the note
     public Cursor getAllNotes() {
         String ColumnList[]= {ENOTE_ID, ENOTE_IVECTOR, ENOTE_TITLE, ENOTE_CONTENTS, ENOTE_LM_DATE};
-        return mDatabase.query(DATABASE_TABLE_NAME, ColumnList , null, null, null, null, ENOTE_LM_DATE);
+        return mDatabase.query(DATABASE_TABLE_NAME, ColumnList , null, null, null, null, ENOTE_LM_DATE+" DESC");
     }
     /*
 		This method will return a Cursor positioned at the note that matched the requested NoteId.
