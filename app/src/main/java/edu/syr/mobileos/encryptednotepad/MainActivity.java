@@ -86,6 +86,7 @@ public class MainActivity extends Activity implements
             noteId = note.getID();
         }
 
+        updateNotes();
         Note new_note = getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(noteId));
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, NoteDetailFragment.newInstance(decryptNote(new_note)))
@@ -114,10 +115,7 @@ public class MainActivity extends Activity implements
         switch (action) {
             case Note.ACTION_DELETE:
                 mENDBManagerObject.deleteNote(note.getID());
-                mNotes = new ArrayList<Note>();
-                Cursor cursor = mENDBManagerObject.getAllNotes();
-                for (long id : getAllNotesIdsFromCursor(cursor))
-                    mNotes.add(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
+                updateNotes();
                 getFragmentManager().beginTransaction()
                         .replace(R.id.container, NoteListFragment.newInstance(mNotes))
                         .addToBackStack(null)
@@ -154,13 +152,7 @@ public class MainActivity extends Activity implements
         mENDBManagerObject.addNote(encryptNote(test_notes.get(1)));
         mENDBManagerObject.addNote(encryptNote(test_notes.get(2)));
 
-        mNotes = new ArrayList<Note>();
-        Note note;
-        for (long id : getAllNotesIdsFromCursor(mENDBManagerObject.getAllNotes())) {
-            note = decryptNote(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
-            if (note != null)
-                mNotes.add(note);
-        }
+        updateNotes();
 
         getFragmentManager().beginTransaction()
                 .add(R.id.container, NoteListFragment.newInstance(mNotes))
@@ -230,6 +222,16 @@ public class MainActivity extends Activity implements
         note.setTitle(decrypted_title);
 
         return note;
+    }
+
+    private void updateNotes() {
+        mNotes = new ArrayList<Note>();
+        Note note;
+        for (long id : getAllNotesIdsFromCursor(mENDBManagerObject.getAllNotes())) {
+            note = decryptNote(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
+            if (note != null)
+                mNotes.add(note);
+        }
     }
 
     // test function, please ignore
