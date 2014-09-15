@@ -145,11 +145,13 @@ public class MainActivity extends Activity implements
         long noteId = cursor.getLong(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_ID));
         String title = cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_TITLE));
         String contents = cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_CONTENTS));
-        byte[] iv = StringUtility.string2Bin(cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_IVECTOR)));
+        byte[] ivTitle = StringUtility.string2Bin(cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_IVECTORTITLE)));
+        byte[] ivContent = StringUtility.string2Bin(cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_IVECTORCONTENT)));
         note.setID(noteId);
         note.setTitle(title);
         note.setText(contents);
-        note.setIV(iv);
+        note.setIVTitle(ivTitle);
+        note.setIVText(ivContent);
         return note;
     }
 
@@ -180,7 +182,7 @@ public class MainActivity extends Activity implements
 
     private Note decryptNote(Note note) {
         String encrypted_blob = note.getText();
-        String hmac = encrypted_blob.substring(0, 31);
+        String hmac = encrypted_blob.substring(0, 32);
         String encrypted_text = encrypted_blob.substring(32);
         if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_text)))) {
             note.setTitle("Title decryption failed!");
@@ -190,7 +192,7 @@ public class MainActivity extends Activity implements
         note.setText(Crypto.aes256_dec(mKey, encrypted_text, note.getIVText()));
 
         encrypted_blob = note.getTitle();
-        hmac = encrypted_blob.substring(0, 31);
+        hmac = encrypted_blob.substring(0, 32);
         encrypted_text = encrypted_blob.substring(32);
         if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_text)))) {
             note.setTitle("Note decryption failed!");

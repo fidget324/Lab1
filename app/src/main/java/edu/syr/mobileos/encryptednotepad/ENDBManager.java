@@ -100,8 +100,8 @@ public class ENDBManager {
     public long addNote(Note note) {
         String title=note.getTitle();
         String eContents=note.getText();
-        String iVectorTitle= StringUtility.bin2String(note.getIV());
-        String iVectorContent= StringUtility.bin2String(note.getIV());
+        String iVectorTitle= StringUtility.bin2String(note.getIVTitle());
+        String iVectorContent= StringUtility.bin2String(note.getIVText());
         ContentValues initialValues = new ContentValues();
         Time currentTime = new Time();
         currentTime.setToNow();
@@ -153,8 +153,8 @@ public class ENDBManager {
      */
     public boolean updateNoteThroughId(Note note) {
         long noteID= note.getID();
-        String iVectorTitle= StringUtility.bin2String(note.getIV()); // We many not need it as we do not need to update the initialization vector
-        String iVectorContent= StringUtility.bin2String(note.getIV());
+        String iVectorTitle= StringUtility.bin2String(note.getIVTitle()); // We many not need it as we do not need to update the initialization vector
+        String iVectorContent= StringUtility.bin2String(note.getIVText());
         String title=note.getTitle();
         String eContents=note.getText();
         ContentValues updatedValues = new ContentValues();
