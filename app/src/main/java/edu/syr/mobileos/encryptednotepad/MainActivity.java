@@ -70,7 +70,7 @@ public class MainActivity extends Activity implements
 
         Note new_note = getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(noteId));
         getFragmentManager().beginTransaction()
-                .replace(R.id.container, NoteDetailFragment.newInstance(new_note))
+                .replace(R.id.container, NoteDetailFragment.newInstance(decryptNote(new_note)))
                 .addToBackStack(null)
                 .commit();
     }
@@ -87,6 +87,7 @@ public class MainActivity extends Activity implements
     public void onNoteCreateClicked() {
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, NoteEditFragment.newInstance())
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -114,6 +115,7 @@ public class MainActivity extends Activity implements
                     Note new_note = getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(note_id));
                     getFragmentManager().beginTransaction()
                             .replace(R.id.container, NoteEditFragment.newInstance(new_note))
+                            .addToBackStack(null)
                             .commit();
                 }
                 break;
