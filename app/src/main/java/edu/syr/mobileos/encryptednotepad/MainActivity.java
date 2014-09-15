@@ -166,11 +166,12 @@ public class MainActivity extends Activity implements
     }
 
     private Note encryptNote(Note note) {
-        note.setIV(Crypto.getIV());
-        String encrypted_text = Crypto.aes256_enc(mKey, note.getText(), note.getIV());
+        note.setIVText(Crypto.getIV());
+        note.setIVTitle(Crypto.getIV());
+        String encrypted_text = Crypto.aes256_enc(mKey, note.getText(), note.getIVText());
         String hmac = Crypto.hmac_sha256(mKey, encrypted_text);
         note.setText(hmac + encrypted_text);
-        String encrypted_title = Crypto.aes256_enc(mKey, note.getTitle(), note.getIV());
+        String encrypted_title = Crypto.aes256_enc(mKey, note.getTitle(), note.getIVText());
         hmac = Crypto.hmac_sha256(mKey, encrypted_title);
         note.setTitle(hmac + encrypted_title);
 
@@ -186,7 +187,7 @@ public class MainActivity extends Activity implements
             note.setText("Password is incorrect. Try Again!");
             return note;
         }
-        note.setText(Crypto.aes256_dec(mKey, encrypted_text, note.getIV()));
+        note.setText(Crypto.aes256_dec(mKey, encrypted_text, note.getIVText()));
 
         encrypted_blob = note.getTitle();
         hmac = encrypted_blob.substring(0, 31);
@@ -196,7 +197,7 @@ public class MainActivity extends Activity implements
             note.setText("Note decryption failed!");
             return note;
         }
-        note.setTitle(Crypto.aes256_dec(mKey, encrypted_text, note.getIV()));
+        note.setTitle(Crypto.aes256_dec(mKey, encrypted_text, note.getIVTitle()));
 
         return note;
     }
