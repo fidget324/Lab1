@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class MainActivity extends Activity implements
 
     private byte[] mKey;
     private ENDBManager mENDBManagerObject;
+    private ArrayList<Note> mNotes;
 
     @Override
     protected void onStart() {
@@ -43,6 +45,9 @@ public class MainActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+
         new TestNotes();
 
         mENDBManagerObject = new ENDBManager(this);
@@ -54,6 +59,19 @@ public class MainActivity extends Activity implements
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.container, NoteListFragment.newInstance(mNotes))
+                        .addToBackStack(null)
+                        .commit();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -96,12 +114,12 @@ public class MainActivity extends Activity implements
         switch (action) {
             case Note.ACTION_DELETE:
                 mENDBManagerObject.deleteNote(note.getID());
-                ArrayList<Note> notes = new ArrayList<Note>();
+                mNotes = new ArrayList<Note>();
                 Cursor cursor = mENDBManagerObject.getAllNotes();
                 for (long id : getAllNotesIdsFromCursor(cursor))
-                    notes.add(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
+                    mNotes.add(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
                 getFragmentManager().beginTransaction()
-                        .replace(R.id.container, NoteListFragment.newInstance(notes))
+                        .replace(R.id.container, NoteListFragment.newInstance(mNotes))
                         .addToBackStack(null)
                         .commit();
                 break;
@@ -136,16 +154,16 @@ public class MainActivity extends Activity implements
         mENDBManagerObject.addNote(encryptNote(test_notes.get(1)));
         mENDBManagerObject.addNote(encryptNote(test_notes.get(2)));
 
-        ArrayList<Note> notes = new ArrayList<Note>();
+        mNotes = new ArrayList<Note>();
         Note note;
         for (long id : getAllNotesIdsFromCursor(mENDBManagerObject.getAllNotes())) {
             note = decryptNote(getNoteThroughCursor(mENDBManagerObject.getNoteThroughId(id)));
             if (note != null)
-                notes.add(note);
+                mNotes.add(note);
         }
 
         getFragmentManager().beginTransaction()
-                .add(R.id.container, NoteListFragment.newInstance(notes))
+                .add(R.id.container, NoteListFragment.newInstance(mNotes))
                 .commit();
     }
 
