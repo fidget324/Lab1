@@ -59,7 +59,7 @@ public class ENDBManager {
             database.execSQL(DATABASE_CREATE_QUERY);
         }
 
-        //In case an upgrade in database version is needed, this function can be used to do so
+        //This method will upgrade the database
         //@Override
         public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
             Log.w(TAG, "Database being upgraded from " + oldVersion + " to " + newVersion + ", destroying all the data in the table note");
@@ -98,7 +98,7 @@ public class ENDBManager {
      * @return rowId or -1 if failed
      */
     public long addNote(Note note) {
-        String title=note.getTitle();
+        String eTitle=note.getTitle();
         String eContents=note.getText();
         String iVectorTitle= StringUtility.bin2String(note.getIVTitle());
         String iVectorContent= StringUtility.bin2String(note.getIVText());
@@ -107,7 +107,7 @@ public class ENDBManager {
         currentTime.setToNow();
         initialValues.put(ENOTE_IVECTORTITLE, iVectorTitle);
         initialValues.put(ENOTE_IVECTORCONTENT, iVectorContent);
-        initialValues.put(ENOTE_TITLE, title);
+        initialValues.put(ENOTE_TITLE, eTitle);
         initialValues.put(ENOTE_CONTENTS, eContents);
         initialValues.put(ENOTE_LM_DATE, currentTime.toString());
         // Inserting the newly created note (title, encryptedContents and currentDate) to the table.
