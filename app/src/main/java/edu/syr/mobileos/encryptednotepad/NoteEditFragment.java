@@ -2,10 +2,12 @@ package edu.syr.mobileos.encryptednotepad;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -79,7 +81,29 @@ public class NoteEditFragment extends Fragment {
             public void onClick(View view) {
                 mNote.setTitle(mEditTitle.getText().toString());
                 mNote.setText(mEditText.getText().toString());
+
+                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
                 mDoneListener.onDoneClicked(mNote);
+            }
+        });
+        mEditTitle.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    if (mCreateNewNote)
+                        mEditTitle.setText("");
+                }
+            }
+        });
+        mEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    if (mCreateNewNote)
+                        mEditText.setText("");
+                }
             }
         });
 
