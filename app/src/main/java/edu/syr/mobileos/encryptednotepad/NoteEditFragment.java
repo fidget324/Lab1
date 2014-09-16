@@ -82,8 +82,9 @@ public class NoteEditFragment extends Fragment {
                 mNote.setTitle(mEditTitle.getText().toString());
                 mNote.setText(mEditText.getText().toString());
 
-                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+/*                InputMethodManager imm = (InputMethodManager)getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0); */
 
                 mDoneListener.onDoneClicked(mNote);
             }
