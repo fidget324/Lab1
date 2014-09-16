@@ -66,7 +66,7 @@ public class Crypto {
         // Create Cipher using "AES" provider
         Cipher cipher = null;
         try {
-            cipher = Cipher.getInstance("AES/CFB/NoPadding");
+            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         } catch (NoSuchAlgorithmException e) {
             Log.d("debug", e.toString());
         } catch (NoSuchPaddingException e) {
@@ -100,7 +100,7 @@ public class Crypto {
         // Create Cipher using "AES" provider
         Cipher cipher = null;
         try {
-            cipher = Cipher.getInstance("AES/CFB/NoPadding");
+            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         } catch (NoSuchAlgorithmException e) {
             Log.d("debug", e.toString());
         } catch (NoSuchPaddingException e) {
