@@ -9,7 +9,9 @@ import android.view.MenuItem;
 
 import java.util.ArrayList;
 
-
+/**
+ * This serves as the Controller in the MVC design pattern.
+ */
 public class MainActivity extends Activity implements
         NoteManipulatorFragment.OnNoteInteractionListener,
         NoteEditFragment.OnDoneClickedListener,
@@ -22,6 +24,9 @@ public class MainActivity extends Activity implements
     private ENDBManager mENDBManagerObject;
     private ArrayList<Note> mNotes;
 
+    /**
+     * Prompt the user to enter the password
+     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -29,6 +34,9 @@ public class MainActivity extends Activity implements
         dialogFragment.show(getFragmentManager(), null);
     }
 
+    /**
+     * Wipe the password from memory (as best we can!)
+     */
     @Override
     protected void onStop() {
         super.onStop();
@@ -38,6 +46,10 @@ public class MainActivity extends Activity implements
         finish();
     }
 
+    /**
+     * Initialize the action bar, database, and fragment container
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,13 +62,23 @@ public class MainActivity extends Activity implements
         mENDBManagerObject.openDatabase();
     }
 
+    /**
+     * Inflate the menu; this adds items to the action bar if it is present.
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
+    /**
+     * Called whenever an Action Bar item controlled by MainActivity is clicked.
+     * In our case this is only the home button.
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -70,6 +92,11 @@ public class MainActivity extends Activity implements
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * User clicked "Done" after editing/creating a note. Add the note to the database, and
+     * display the updated/new note
+     * @param note   the note that was edited
+     */
     @Override
     public void onDoneClicked(Note note) {
         note = encryptNote(note);
@@ -90,6 +117,10 @@ public class MainActivity extends Activity implements
                 .commit();
     }
 
+    /**
+     * User selected a note from a list of notes. Display that note
+     * @param note   the note that was clicked
+     */
     @Override
     public void onNoteClicked(Note note) {
         getFragmentManager().beginTransaction()
@@ -98,6 +129,9 @@ public class MainActivity extends Activity implements
                 .commit();
     }
 
+    /**
+     * User wishes to create a new note.
+     */
     @Override
     public void onNoteCreateClicked() {
         getFragmentManager().beginTransaction()
@@ -106,6 +140,11 @@ public class MainActivity extends Activity implements
                 .commit();
     }
 
+    /**
+     * User wishes to manipulate a note
+     * @param action    can be Note.ACTION_DELETE or Note.ACTION_EDIT
+     * @param note      the note to manipulate
+     */
     @Override
     public void onNoteInteraction(int action, Note note) {
         switch (action) {
@@ -134,6 +173,10 @@ public class MainActivity extends Activity implements
         }
     }
 
+    /**
+     * User has entered the password, so we must hash it to generate the Key
+     * @param password
+     */
     @Override
     public void onFinishEditDialog(String password) {
         mKey = Crypto.sha256(password);
@@ -144,6 +187,11 @@ public class MainActivity extends Activity implements
                 .commit();
     }
 
+    /**
+     * Convert a Cursor object to a Note
+     * @param cursor    A cursor set to a single note to convert
+     * @return          The converted note
+     */
     private Note getNoteThroughCursor(Cursor cursor)
     {
         Note note = new Note();
