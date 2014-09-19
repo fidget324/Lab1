@@ -19,6 +19,10 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class Crypto {
 
+    private static final String HASH_ALG = "SHA-256";
+    private static final String CIPHER_ALG = "AES/CBC/PKCS5Padding";
+    private static final String HMAC_ALG = "HmacSHA256";
+
     /**
      * offer a 16-byte IV for each note, since the block size in AES is 16 bytes
      */
@@ -39,7 +43,7 @@ public class Crypto {
         MessageDigest digest = null;
 
         try {
-            digest = MessageDigest.getInstance("SHA-256");
+            digest = MessageDigest.getInstance(HASH_ALG);
         } catch (NoSuchAlgorithmException e1) {
             e1.printStackTrace();
         }
@@ -66,7 +70,7 @@ public class Crypto {
         // Create Cipher using "AES" provider
         Cipher cipher = null;
         try {
-            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher = Cipher.getInstance(CIPHER_ALG);
         } catch (NoSuchAlgorithmException e) {
             Log.d("debug", e.toString());
         } catch (NoSuchPaddingException e) {
@@ -75,7 +79,7 @@ public class Crypto {
 
         if (cipher != null) {
             try {
-                cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(pIV));//.getBytes(ENCODER)));
+                cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, CIPHER_ALG), new IvParameterSpec(pIV));//.getBytes(ENCODER)));
                 byte[] encrypted_data = cipher.doFinal(data.getBytes(StringUtility.ENCODER));
                 return StringUtility.bin2String(encrypted_data);
             } catch (Exception e) {
@@ -100,7 +104,7 @@ public class Crypto {
         // Create Cipher using "AES" provider
         Cipher cipher = null;
         try {
-            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher = Cipher.getInstance(CIPHER_ALG);
         } catch (NoSuchAlgorithmException e) {
             Log.d("debug", e.toString());
         } catch (NoSuchPaddingException e) {
@@ -109,7 +113,7 @@ public class Crypto {
 
         if (cipher != null) {
             try {
-                cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(pIV));//.getBytes(ENCODER)));
+                cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, CIPHER_ALG), new IvParameterSpec(pIV));//.getBytes(ENCODER)));
                 byte[] decrypted_data = cipher.doFinal(data.getBytes(StringUtility.ENCODER));
                 return StringUtility.bin2String(decrypted_data);
             } catch (Exception e) {
@@ -134,16 +138,15 @@ public class Crypto {
         Mac mac = null;
         String digestString=null;
         try {
-            mac = Mac.getInstance("HmacSHA256");
+            mac = Mac.getInstance(HMAC_ALG);
         } catch (NoSuchAlgorithmException e) {
             Log.d("debug", e.toString());
         }
         if (mac != null) {
             try {
-                mac.init(new SecretKeySpec(key, "HmacSHA256"));
+                mac.init(new SecretKeySpec(key, HMAC_ALG));
                 byte[] digest = mac.doFinal(data.getBytes(StringUtility.ENCODER));
                 digestString = StringUtility.bin2String(digest);
-                return digestString;
 
             } catch (Exception e) {
                 Log.d("debug", e.toString());
