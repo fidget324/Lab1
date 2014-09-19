@@ -7,8 +7,10 @@ import java.io.Serializable;
  */
 public class Note implements Serializable {
 
+    // Allows us to use Notes as arguments to Fragments
     private static final long serialVersionUID = 464897646;
 
+    // Actions which can be performed on an existing note
     public static final int ACTION_DELETE       = 0;
     public static final int ACTION_EDIT         = 1;
 

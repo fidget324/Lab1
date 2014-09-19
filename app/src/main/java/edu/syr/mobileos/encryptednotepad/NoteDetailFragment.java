@@ -23,9 +23,12 @@ public class NoteDetailFragment extends NoteManipulatorFragment {
             "edu.syr.mobileos.encryptednotepad.NoteDetailFragment.note";
 
     private Note mNote;
-    private TextView mTitleView;
-    private TextView mTextView;
 
+    /**
+     * Create a new instance of the NoteDetailFragment
+     * @param note      The note to display in the fragment
+     * @return          The NoteDetailFragment
+     */
     public static NoteDetailFragment newInstance(Note note) {
         NoteDetailFragment fragment = new NoteDetailFragment();
         Bundle args = new Bundle();
@@ -38,6 +41,10 @@ public class NoteDetailFragment extends NoteManipulatorFragment {
         // Required empty public constructor
     }
 
+    /**
+     * Read the note argument
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,27 +54,44 @@ public class NoteDetailFragment extends NoteManipulatorFragment {
         }
     }
 
+    /**
+     * Initialize the display items
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View fragment_view = inflater.inflate(R.layout.fragment_note_detail, container, false);
 
-        mTitleView = (TextView) fragment_view.findViewById(R.id.fragment_note_detail_title);
-        mTextView = (TextView) fragment_view.findViewById(R.id.fragment_note_detail_text);
+        TextView titleView = (TextView) fragment_view.findViewById(R.id.fragment_note_detail_title);
+        TextView textView = (TextView) fragment_view.findViewById(R.id.fragment_note_detail_text);
 
-        mTitleView.setText(mNote.getTitle());
-        mTextView.setText(mNote.getText());
+        titleView.setText(mNote.getTitle());
+        textView.setText(mNote.getText());
 
         return fragment_view;
     }
 
+    /**
+     * Inflate the options menu
+     * @param menu
+     * @param inflater
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_note_detail, menu);
     }
 
+    /**
+     * Listen on the Edit and Delete Action Bar buttons. Callback whenever one is clicked
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

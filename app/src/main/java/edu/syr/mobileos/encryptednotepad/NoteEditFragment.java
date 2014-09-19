@@ -52,6 +52,11 @@ public class NoteEditFragment extends Fragment {
         // Required empty public constructor
     }
 
+    /**
+     * Decide whether we are creating or editing a note
+     * Extract the note argument if we are editing a note
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +70,13 @@ public class NoteEditFragment extends Fragment {
         }
     }
 
+    /**
+     * Inflate the layout, and set up listeners
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

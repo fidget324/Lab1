@@ -36,7 +36,11 @@ public class NoteListFragment extends NoteManipulatorFragment {
     private OnNoteCreateListener mNoteCreateListener;
     private ArrayAdapter<String> mAdapter;
 
-    // TODO: Rename and change types and number of parameters
+    /**
+     * Display a set of notes in a ListView
+     * @param notes     notes to display
+     * @return          a new instance of NoteListFragment
+     */
     public static NoteListFragment newInstance(ArrayList<Note> notes) {
         NoteListFragment fragment = new NoteListFragment();
         Bundle args = new Bundle();
@@ -49,6 +53,10 @@ public class NoteListFragment extends NoteManipulatorFragment {
         // Required empty public constructor
     }
 
+    /**
+     * Retrieve the list of notes from the fragment argument, and set up the adapter
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +77,13 @@ public class NoteListFragment extends NoteManipulatorFragment {
                 titles);
     }
 
+    /**
+     * Inflate the view
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -94,6 +109,11 @@ public class NoteListFragment extends NoteManipulatorFragment {
         inflater.inflate(R.menu.menu_note_list, menu);
     }
 
+    /**
+     * Listen on the Edit and Delete Action Bar buttons. Callback whenever one is clicked
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
