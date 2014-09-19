@@ -19,12 +19,10 @@ public class ENDBManager {
     // Declaring database level details
     private static final String DATABASE_NAME = "Notepad";
     private static final String DATABASE_TABLE_NAME = "EncryptedNote";
-    private static final String DATABASE_CREATE_QUERY="CREATE TABLE "+DATABASE_TABLE_NAME+ " (NoteID INTEGER PRIMARY KEY AUTOINCREMENT, IVectorTitle TEXT NOT NULL, IVectorContent TEXT NOT NULL, NoteTitle TEXT NOT NULL, NoteContents TEXT NOT NULL, LastModifiedDate DATE DEFAULT CURRENT_DATE);";
-    private static final int DATABASE_VERSION = 2;
+    private static final String DATABASE_CREATE_QUERY="CREATE TABLE "+DATABASE_TABLE_NAME+ " (NoteID INTEGER PRIMARY KEY AUTOINCREMENT, NoteTitle TEXT NOT NULL, NoteContents TEXT NOT NULL, LastModifiedDate DATE DEFAULT CURRENT_DATE);";
+    private static final int DATABASE_VERSION = 1;
 
     // Note level attributes
-    public static final String ENOTE_IVECTORTITLE = "IVectorTitle";
-    public static final String ENOTE_IVECTORCONTENT = "IVectorContent";
     public static final String ENOTE_ID = "NoteID";
     public static final String ENOTE_TITLE = "NoteTitle";
     public static final String ENOTE_CONTENTS = "NoteContents";
@@ -99,13 +97,9 @@ public class ENDBManager {
     public long addNote(Note note) {
         String eTitle=note.getTitle();
         String eContents=note.getText();
-        String iVectorTitle= StringUtility.bin2String(note.getIVTitle());
-        String iVectorContent= StringUtility.bin2String(note.getIVText());
         ContentValues initialValues = new ContentValues();
         Time currentTime = new Time();
         currentTime.setToNow();
-        initialValues.put(ENOTE_IVECTORTITLE, iVectorTitle);
-        initialValues.put(ENOTE_IVECTORCONTENT, iVectorContent);
         initialValues.put(ENOTE_TITLE, eTitle);
         initialValues.put(ENOTE_CONTENTS, eContents);
         initialValues.put(ENOTE_LM_DATE, currentTime.toString());
@@ -129,7 +123,7 @@ public class ENDBManager {
      * @return      cursor containing all notes
      */
     public Cursor getAllNotes() {
-        String ColumnList[]= {ENOTE_ID, ENOTE_IVECTORTITLE, ENOTE_IVECTORCONTENT, ENOTE_TITLE, ENOTE_CONTENTS, ENOTE_LM_DATE};
+        String ColumnList[]= {ENOTE_ID, ENOTE_TITLE, ENOTE_CONTENTS, ENOTE_LM_DATE};
         return mDatabase.query(DATABASE_TABLE_NAME, ColumnList , null, null, null, null, ENOTE_LM_DATE+" DESC");
     }
     /*
@@ -144,7 +138,7 @@ public class ENDBManager {
      */
     public Cursor getNoteThroughId(long noteId) throws SQLException {
 
-        String ColumnList[]= {ENOTE_ID, ENOTE_IVECTORTITLE, ENOTE_IVECTORCONTENT, ENOTE_TITLE, ENOTE_CONTENTS, ENOTE_LM_DATE};
+        String ColumnList[]= {ENOTE_ID, ENOTE_TITLE, ENOTE_CONTENTS, ENOTE_LM_DATE};
 
         Cursor cursorAtGivenNoteId =mDatabase.query(true, DATABASE_TABLE_NAME, ColumnList, ENOTE_ID + "=" + noteId, null,
                 null, null, null, null);
@@ -166,15 +160,11 @@ public class ENDBManager {
      */
     public boolean updateNoteThroughId(Note note) {
         long noteID= note.getID();
-        String iVectorTitle= StringUtility.bin2String(note.getIVTitle()); // We many not need it as we do not need to update the initialization vector
-        String iVectorContent= StringUtility.bin2String(note.getIVText());
         String title=note.getTitle();
         String eContents=note.getText();
         ContentValues updatedValues = new ContentValues();
         Time currentTime = new Time();
         currentTime.setToNow();
-        updatedValues.put(ENOTE_IVECTORTITLE, iVectorTitle); // We many not need it as we do not need to update the initialization vector
-        updatedValues.put(ENOTE_IVECTORCONTENT, iVectorContent);
         updatedValues.put(ENOTE_TITLE, title);
         updatedValues.put(ENOTE_CONTENTS, eContents);
         updatedValues.put(ENOTE_LM_DATE, currentTime.toString());
