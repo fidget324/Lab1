@@ -198,13 +198,9 @@ public class MainActivity extends Activity implements
         long noteId = cursor.getLong(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_ID));
         String title = cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_TITLE));
         String contents = cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_CONTENTS));
-        byte[] ivTitle = StringUtility.string2Bin(cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_IVECTORTITLE)));
-        byte[] ivContent = StringUtility.string2Bin(cursor.getString(cursor.getColumnIndexOrThrow(ENDBManager.ENOTE_IVECTORCONTENT)));
         note.setID(noteId);
         note.setTitle(title);
         note.setText(contents);
-        note.setIVTitle(ivTitle);
-        note.setIVText(ivContent);
         return note;
     }
 
@@ -221,12 +217,14 @@ public class MainActivity extends Activity implements
     }
 
     private Note encryptNote(Note note) {
-        note.setIVTitle(Crypto.getIV());
-        note.setIVText(Crypto.getIV());
-        String encrypted_text = Crypto.aes256_enc(mKey, note.getText(), note.getIVText());
+        byte[] ivTitle = Crypto.getIV();
+        byte[] ivText = Crypto.getIV();
+        String encrypted_text = StringUtility.bin2String(ivText) +
+                Crypto.aes256_enc(mKey, note.getText(), ivText);
         String hmac = Crypto.hmac_sha256(mKey, encrypted_text);
         note.setText(hmac + encrypted_text);
-        String encrypted_title = Crypto.aes256_enc(mKey, note.getTitle(), note.getIVTitle());
+        String encrypted_title = StringUtility.bin2String(ivTitle) +
+                Crypto.aes256_enc(mKey, note.getTitle(), ivTitle);
         hmac = Crypto.hmac_sha256(mKey, encrypted_title);
         note.setTitle(hmac + encrypted_title);
 
@@ -240,18 +238,18 @@ public class MainActivity extends Activity implements
         if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_text)))) {
             return null;
         }
-        byte[] iv = note.getIVText();
-        String decrypted_text = Crypto.aes256_dec(mKey, encrypted_text, iv);
+        byte[] ivText = StringUtility.string2Bin(encrypted_text.substring(0, 16));
+        String decrypted_text = Crypto.aes256_dec(mKey, encrypted_text.substring(16), ivText);
         note.setText(decrypted_text);
 
         encrypted_blob = note.getTitle();
         hmac = encrypted_blob.substring(0, 32);
-        encrypted_text = encrypted_blob.substring(32);
-        if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_text)))) {
+        String encrypted_title = encrypted_blob.substring(32);
+        if (!(hmac.equals(Crypto.hmac_sha256(mKey, encrypted_title)))) {
             return null;
         }
-        iv = note.getIVTitle();
-        String decrypted_title = Crypto.aes256_dec(mKey, encrypted_text, iv);
+        byte[] ivTitle = StringUtility.string2Bin(encrypted_title.substring(0, 16));
+        String decrypted_title = Crypto.aes256_dec(mKey, encrypted_title.substring(16), ivTitle);
         note.setTitle(decrypted_title);
 
         return note;
