@@ -15,9 +15,8 @@ import android.util.Log;
  * DOES NOT USE RAW QUERIES.
  */
 public class ENDBManager {
-    private static final String ENCODER = "ISO-8859-1";
-    // Declaring database level details
 
+    // Declaring database level details
     private static final String DATABASE_NAME = "Notepad";
     private static final String DATABASE_TABLE_NAME = "EncryptedNote";
     private static final String DATABASE_CREATE_QUERY="CREATE TABLE "+DATABASE_TABLE_NAME+ " (NoteID INTEGER PRIMARY KEY AUTOINCREMENT, IVectorTitle TEXT NOT NULL, IVectorContent TEXT NOT NULL, NoteTitle TEXT NOT NULL, NoteContents TEXT NOT NULL, LastModifiedDate DATE DEFAULT CURRENT_DATE);";
@@ -115,15 +114,20 @@ public class ENDBManager {
 
     }
 
-
+    /**
+     * Delete a single note, given that note's ID
+     * @param NoteId    SQL ID of the note to be deleted
+     * @return          true if the delete was successful
+     */
     public boolean deleteNote(long NoteId) {
         // Deleting the note with the given ID from the table EncryptedNote.
         return mDatabase.delete(DATABASE_TABLE_NAME, ENOTE_ID + "=" + NoteId, null) > 0;
     }
 
-    // This method will retrieve all the notes from the database ordered by the Last Modified Date
-    // A Cursor will be returned by this function
-    // This method will be used for implementing the view Notes and Search for the note
+    /**
+     * This method will retrieve all the notes from the database ordered by the Last Modified Date
+     * @return      cursor containing all notes
+     */
     public Cursor getAllNotes() {
         String ColumnList[]= {ENOTE_ID, ENOTE_IVECTORTITLE, ENOTE_IVECTORCONTENT, ENOTE_TITLE, ENOTE_CONTENTS, ENOTE_LM_DATE};
         return mDatabase.query(DATABASE_TABLE_NAME, ColumnList , null, null, null, null, ENOTE_LM_DATE+" DESC");
@@ -131,6 +135,13 @@ public class ENDBManager {
     /*
 		This method will return a Cursor positioned at the note that matched the requested NoteId.
     */
+
+    /**
+     * This method will return a Cursor positioned at the note that matched the requested NoteId.
+     * @param noteId    SQL ID of the note to look up
+     * @return          cursor positioned at the note that matched
+     * @throws SQLException
+     */
     public Cursor getNoteThroughId(long noteId) throws SQLException {
 
         String ColumnList[]= {ENOTE_ID, ENOTE_IVECTORTITLE, ENOTE_IVECTORCONTENT, ENOTE_TITLE, ENOTE_CONTENTS, ENOTE_LM_DATE};
@@ -144,12 +155,14 @@ public class ENDBManager {
 
     }
 
-    /*
-        This function will take the following arguments to update the desired note
-        1. NoteId,
-        2. Updated Title of the note,
-        3. Updated Content of the note
-        In case the systems fails to update the database for any reason, it will return false otherwise true;
+    /**
+     * This function will take the following arguments to update the desired note
+     1. NoteId,
+     2. Updated Title of the note,
+     3. Updated Content of the note
+     In case the systems fails to update the database for any reason, it will return false otherwise true;
+     * @param note      The updated note
+     * @return          true on a successful update, false otherwise
      */
     public boolean updateNoteThroughId(Note note) {
         long noteID= note.getID();
